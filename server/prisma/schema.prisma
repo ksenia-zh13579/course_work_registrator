@@ -4,11 +4,125 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
-// datasource db {
-//   provider = "postgresql"
-// }
+datasource db {
+  provider = "postgresql"
+}
 
+enum Role {
+  VIEWER
+  ADMIN
+}
+
+enum Method {
+  GET
+  POST
+  PATCH
+  DELETE
+}
+
+enum InvStatus {
+  WITNESS
+  SUSPECT
+  GUILTY
+  VICTIM  
+}
+
+model User {
+  user_id Int @id @default(autoincrement())
+  username String @unique
+  surname String
+  name String
+  patronymic String?
+  password_hash String
+  role Role @default(VIEWER)
+  updatedAt DateTime @updatedAt
+  userPermissions UserPermission[]
+  refreshTokens RefreshToken[]
+}
+
+model Route {
+  route_id Int @id @default(autoincrement())
+  name String @unique
+  permissions Permission[]
+}
+
+model Permission {
+  permission_id Int @id @default(autoincrement())
+  name String @unique
+  method Method
+  route_id Int 
+  route Route @relation(fields: [route_id], references: [route_id], onDelete: Cascade)
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
+}
+
+model RolePermission {
+  role_permission_id Int @id @default(autoincrement())
+  role Role
+  permission_id Int
+  permission Permission @relation(fields: [permission_id], references: [permission_id], onDelete: Cascade)
+}
+
+model UserPermission {
+  user_permission_id Int @id @default(autoincrement())
+  user_id Int
+  user User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  permission_id Int
+  permission Permission @relation(fields: [permission_id], references: [permission_id], onDelete: Cascade)
+}
+
+model IncidentType {
+  incident_type_id Int @id @default(autoincrement())
+  name String @unique
+  incidents Incident[]
+}
+
+model IncidentStatus {
+  incident_status_id Int @id @default(autoincrement())
+  name String @unique
+  description String
+  incidents Incident[]
+}
+
+model Incident {
+  incident_id Int @id @default(autoincrement())
+  date DateTime
+  incident_type_id Int
+  incident_type IncidentType @relation(fields: [incident_type_id], references: [incident_type_id], onDelete: Cascade)
+  description String?
+  incident_status_id Int
+  incident_status IncidentStatus @relation(fields: [incident_status_id], references: [incident_status_id], onDelete: Cascade)
+  reg_number String?
+  involvements Involvement[]
+}
+
+model Participant {
+  participant_id Int @id @default(autoincrement())
+  surname String
+  name String
+  patronymic String?
+  address String
+  crimial_records Int
+  involvements Involvement[]
+}
+
+model Involvement {
+  involvement_id Int @id @default(autoincrement())
+  participant_id Int
+  participant Participant @relation(fields: [participant_id], references: [participant_id], onDelete: Cascade)
+  incident_id Int
+  incident Incident @relation(fields: [incident_id], references: [incident_id], onDelete: Cascade)
+  status InvStatus
+}
+
+model RefreshToken {
+  id            Int      @id @default(autoincrement())
+  token         String   @unique
+  userId        Int
+  user          User     @relation(fields: [userId], references: [user_id], onDelete: Cascade)
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+}
