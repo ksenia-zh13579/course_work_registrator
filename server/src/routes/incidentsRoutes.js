@@ -2,15 +2,16 @@ import { Router } from 'express';
 import * as incidentsController from '../controllers/incidentsController.js';
 import { authenticate, authorize } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middlewares/validateMiddlewares.js';
-import { getIncidentsSchema, createIncidentSchema, updateIncidentSchema } from '../validators/incidentsValidator.js';
+import { getIncidentsQuerySchema, createIncidentSchema, updateIncidentSchema } from '../validators/incidentsValidator.js';
 
 export const incidentsRouter = Router();
 
 incidentsRouter.get(
     '/', 
-    validateRequest(getIncidentsSchema), 
+    validateRequest(getIncidentsQuerySchema, 'query'), 
     incidentsController.getIncidents
 );
+
 incidentsRouter.post(
     '/',
     authenticate,
@@ -18,6 +19,7 @@ incidentsRouter.post(
     validateRequest(createIncidentSchema),
     incidentsController.createIncident
 );
+
 incidentsRouter.patch(
     '/:id',
     authenticate,
@@ -25,6 +27,7 @@ incidentsRouter.patch(
     validateRequest(updateIncidentSchema),
     incidentsController.updateIncident
 );
+
 incidentsRouter.delete(
     '/:id',
     authenticate,

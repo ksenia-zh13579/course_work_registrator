@@ -3,6 +3,8 @@ import cors from "cors";
 import { router } from "./routes/index.js";
 import cookieParser from 'cookie-parser';
 import { errorHandler } from "./middleware/errorHandler.js";
+import swaggerUi from 'swagger-ui-express';
+import { generateSwaggerDoc } from './docs/openapi.js';
 
 const app = express();
 
@@ -12,6 +14,9 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
 }));
+
+const swaggerSpec = generateSwaggerDoc();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());
 app.use(cookieParser());

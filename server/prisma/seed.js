@@ -1,9 +1,9 @@
 import { prisma }  from "../src/client.js";
-import bcrypt from "bcrypt";
+import { getPasswordHash } from "../src/utils/passwordActions.js";
 import { Role, Method, InvStatus } from "@prisma/client";
 
 async function main() {
-    const adminPassHash = await bcrypt.hash("adminpass", 10);
+    const adminPassHash = await getPasswordHash("adminpass", 10);
 
     const adminUser = await prisma.user.upsert({
         where: {
@@ -77,6 +77,8 @@ async function main() {
             {name: '/api/profile'},
             {name: '/api/incidents'},
             {name: '/api/incidents/:id'},
+            {name: '/api/incidents/form/types'},
+            {name: '/api/incidents/form/statuses'},
             {name: '/api/participants'},
             {name: '/api/participants/:id'},
             {name: '/api/participants/search?q={query}'},
@@ -97,8 +99,9 @@ async function main() {
             {name: 'incidents:write', method: Method.POST, route_id: routes.find(r => r.name == '/api/incidents').route_id},
             {name: 'incident:redact', method: Method.PATCH, route_id: routes.find(r => r.name == '/api/incidents/:id').route_id},
             {name: 'incident:delete', method: Method.DELETE, route_id: routes.find(r => r.name == '/api/incidents/:id').route_id},
+            {name: 'incidents_types:read', method: Method.GET, route_id: routes.find(r => r.name == '/api/incidents/form/types').route_id},
+            {name: 'incidents_statuses:read', method: Method.GET, route_id: routes.find(r => r.name == '/api/incidents/form/statuses').route_id},
             {name: 'participants:read', method: Method.GET, route_id: routes.find(r => r.name == '/api/participants').route_id},
-            {name: 'participants:search', method: Method.GET, route_id: routes.find(r => r.name == '/api/participants/search?q={query}').route_id},
             {name: 'participants:write', method: Method.POST, route_id: routes.find(r => r.name == '/api/participants').route_id},
             {name: 'participant:redact', method: Method.PATCH, route_id: routes.find(r => r.name == '/api/participants/:id').route_id},
             {name: 'participant:delete', method: Method.DELETE, route_id: routes.find(r => r.name == '/api/participants/:id').route_id},
@@ -114,6 +117,8 @@ async function main() {
         'profile:read', 
         'profile:redact', 
         'incidents:write', 
+        'incidents_types:read',
+        'incidents_statuses:read'
     ];
 
     let data = [];

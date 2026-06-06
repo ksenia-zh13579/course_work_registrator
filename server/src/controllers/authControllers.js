@@ -1,4 +1,5 @@
-import bcrypt from 'bcrypt';
+import { verifyPassword, getPasswordHash } from '../utils/passwordActions.js';
+import { getUserByUsername } from '../utils/BDgetters.js';
 import { prisma } from '../client.js';
 import { generateAccessToken, generateRefreshToken } from '../services/auth.service.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -7,12 +8,12 @@ import { AppError } from '../utils/errors.js';
 export const login = asyncHandler(async (req, res) => {
     const { username, password } = req.body;
 
-    const user = await prisma.user.findUnique({ where: { username } });
+    const user = await getUserByUsername(username);
     if (!user) {
         throw new AppError(401, 'Неверное имя пользователя или пароль');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    const isPasswordValid = await verifyPassword(password, user.password_hash);
     if (!isPasswordValid) {
         throw new AppError(401, 'Неверное имя пользователя или пароль');
     }
@@ -51,12 +52,12 @@ export const login = asyncHandler(async (req, res) => {
 export const register = asyncHandler(async (req, res) => {
     const { username, surname, name, patronymic, password } = req.body;
 
-    const existingUser = await prisma.user.findUnique({ where: { username } });
+    const existingUser = await getUserByUsername(username);
     if (existingUser) {
         throw new AppError(409, 'Пользователь с таким именем уже существует');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await getPasswordHash(password, 10);
 
     const user = await prisma.user.create({
         data: {
