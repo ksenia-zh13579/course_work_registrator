@@ -1,10 +1,8 @@
 import { OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
-import { z } from 'zod';
 import { OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
+import { z } from 'zod';
 
 export const registry = new OpenAPIRegistry();
-
-// ...
 
 export function generateSwaggerDoc() {
     const generator = new OpenApiGeneratorV3(registry.definitions);
@@ -16,6 +14,15 @@ export function generateSwaggerDoc() {
             description: 'Документация для сервиса регистрации инцидентов',
         },
         servers: [{ url: '/api' }],
-        // Здесь можно добавить security schemes, если нужно
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+        security: [{ bearerAuth: [] }],
     });
 }

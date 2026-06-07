@@ -3,6 +3,7 @@ import * as involvementsController from '../controllers/involvementsController.j
 import { authenticate, authorize } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middlewares/validateMiddlewares.js';
 import { searchInvolvementsQuerySchema, createInvolvementSchema, updateInvolvementSchema } from '../validators/involvementsValidator.js';
+import { idParamsSchema } from '../validators/index.js';
 
 export const involvementsRouter = Router();
 
@@ -27,6 +28,7 @@ involvementsRouter.post(
 involvementsRouter.patch(
     '/:id',
     authorize('involvements:redact'),
+    validateRequest(idParamsSchema, 'params'),
     validateRequest(updateInvolvementSchema),
     involvementsController.updateInvolvement
 );
@@ -34,5 +36,6 @@ involvementsRouter.patch(
 involvementsRouter.delete(
     '/:id',
     authorize('involvements:delete'),
+    validateRequest(idParamsSchema, 'params'),
     involvementsController.deleteInvolvement
 );

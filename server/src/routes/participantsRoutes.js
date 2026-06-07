@@ -3,6 +3,7 @@ import * as participantsController from '../controllers/participantsController.j
 import { authenticate, authorize } from '../middleware/authMiddleware.js';
 import { validateRequest } from '../middlewares/validateMiddlewares.js';
 import { searchParticipantsQuerySchema, createParticipantSchema, updateParticipantSchema } from '../validators/participantsValidator.js';
+import { idParamsSchema } from '../validators/index.js';
 
 export const participantsRouter = Router();
 
@@ -31,6 +32,7 @@ participantsRouter.post(
 participantsRouter.patch(
     '/:id',
     authorize('participants:redact'),
+    validateRequest(idParamsSchema, 'params'),
     validateRequest(updateParticipantSchema),
     participantsController.updateParticipant
 );
@@ -38,5 +40,6 @@ participantsRouter.patch(
 participantsRouter.delete(
     '/:id',
     authorize('participants:delete'),
+    validateRequest(idParamsSchema, 'params'),
     participantsController.deleteParticipant
 );

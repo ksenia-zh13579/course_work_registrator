@@ -54,7 +54,7 @@ export const register = asyncHandler(async (req, res) => {
 
     const existingUser = await getUserByUsername(username);
     if (existingUser) {
-        throw new AppError(409, 'Пользователь с таким именем уже существует');
+        throw new AppError(409, 'Пользователь с таким именем пользователя уже существует');
     }
 
     const hashedPassword = await getPasswordHash(password, 10);
@@ -120,9 +120,9 @@ export const refresh = asyncHandler(async (req, res) => {
 
     if (!storedToken || storedToken.expiresAt < new Date()) {
         if (storedToken) {
-        await prisma.refreshToken.deleteMany({ where: { userId: storedToken.userId } });
+            await prisma.refreshToken.deleteMany({ where: { userId: storedToken.userId } });
         }
-        throw new AppError(401, 'Refresh-токен недействителен. Пожалуйста, войдите снова.');
+        throw new AppError(401, 'Refresh-токен недействителен или истёк');
     }
 
     await prisma.refreshToken.delete({ where: { id: storedToken.id } });
@@ -132,9 +132,9 @@ export const refresh = asyncHandler(async (req, res) => {
 
     await prisma.refreshToken.create({
         data: {
-        token: newJti,
-        userId: storedToken.userId,
-        expiresAt,
+            token: newJti,
+            userId: storedToken.userId,
+            expiresAt,
         },
     });
 
