@@ -1,11 +1,10 @@
 import { prisma } from '../client.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/errors.js';
-import { Math } from 'math';
 import { getParticipantById } from '../utils/BDgetters.js';
 
 export const searchParticipants = asyncHandler(async (req, res) => {
-    const { q } = req.query;
+    const { q } = req.validatedQuery || req.query;
 
     const words = q.trim().split(/\s+/);
 
@@ -24,9 +23,11 @@ export const searchParticipants = asyncHandler(async (req, res) => {
         orderBy: { surname: 'asc' },
     });
 
+    /*
     if (data.length === 0)
-        throw AppError(404, "По данному запросу ничего не найдено.");
-
+        throw new AppError(404, "По данному запросу ничего не найдено.");
+    */
+    
     res.json({ 
         data
     });
@@ -37,9 +38,11 @@ export const getParticipants = asyncHandler(async (req, res) => {
         orderBy: { surname: 'asc' } 
     });
 
+    /*
     if (data.length === 0)
-        throw AppError(404, "Пока не добавлено ни одного участника происшествий.");
-
+        throw new AppError(404, "Пока не добавлено ни одного участника происшествий.");
+    */
+    
     res.json({ 
         data
     });
@@ -66,18 +69,18 @@ export const updateParticipant = asyncHandler(async (req, res) => {
 
     const existingParticipant = getParticipantById(id);
     if (!existingParticipant) 
-        throw AppError(404, "Участник не найден", [{ id }]);
+        throw new AppError(404, "Участник не найден", [{ id }]);
 
     const { surname, name, patronymic, address, crimial_records } = req.body;
 
     const updatedParticipant = await prisma.participant.update({
         where: { participant_id: id },
         data: {
-            surname: surname !== undefined? surname: existingIncident.surname, 
-            name: name !== undefined? name: existingIncident.name, 
-            patronymic: patronymic !== undefined? patronymic: existingIncident.patronymic, 
-            address: address !== undefined? address: existingIncident.address, 
-            crimial_records: crimial_records !== undefined? crimial_records: existingIncident.crimial_records
+            surname: surname !== undefined? surname: existingParticipant.surname, 
+            name: name !== undefined? name: existingParticipant.name, 
+            patronymic: patronymic !== undefined? patronymic: existingParticipant.patronymic, 
+            address: address !== undefined? address: existingParticipant.address, 
+            crimial_records: crimial_records !== undefined? crimial_records: existingParticipant.crimial_records
         }
     });
 
@@ -89,7 +92,7 @@ export const deleteParticipant = asyncHandler(async (req, res) => {
 
     const existingParticipant = getParticipantById(id);
     if (!existingParticipant) 
-        throw AppError(404, "Участник не найден", [{ id }]);
+        throw new AppError(404, "Участник не найден", [{ id }]);
 
     const deletedParticipant = await prisma.participant.delete({
         where: { participant_id: id }

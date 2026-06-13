@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './index.js';
 import { Role } from '@prisma/client';
 
 export const registerSchema = z.object({

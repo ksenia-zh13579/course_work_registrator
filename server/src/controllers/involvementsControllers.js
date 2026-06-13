@@ -4,27 +4,30 @@ import { AppError } from '../utils/errors.js';
 import { getInvolvementById } from '../utils/BDgetters.js';
 
 export const searchInvolvements = asyncHandler(async (req, res) => {
-    const { q } = req.query;
+    const { q } = req.validatedQuery || req.query;
     
-    const words = q.trim().split(/\s+/);
-    const wordConditions = words.map(word => ({
+    if (!q || !q.trim()) return res.json({ data: [] });
+
+    const words = q.trim().split(/\s+/).filter(Boolean);
+
+    const participantWordConditions = words.map(word => ({
         OR: [
-        { surname: { contains: word, mode: 'insensitive' } },
-        { name: { contains: word, mode: 'insensitive' } },
-        { patronymic: { contains: word, mode: 'insensitive' } },
+            { surname: { contains: word, mode: 'insensitive' } },
+            { name: { contains: word, mode: 'insensitive' } },
+            { patronymic: { contains: word, mode: 'insensitive' } },
         ],
     }));
 
-    const participantCondition = { AND: wordConditions };
-
-    const incidentCondition = { AND: words.map(word => ({ name: { contains: word, mode: 'insensitive' } })) };
+    const incidentWordConditions = words.map(word => ({ 
+        name: { contains: word, mode: 'insensitive' } 
+    }));
 
     const involvements = await prisma.involvement.findMany({
         where: {
-            participant: participantCondition,
-            incident: {
-                incident_type: incidentCondition
-            }
+            OR: [
+                { participant: { OR: participantWordConditions } },
+                { incident: { incident_type: { OR: incidentWordConditions } } }
+            ]
         },
         include: {
             incident: { 
@@ -44,8 +47,10 @@ export const searchInvolvements = asyncHandler(async (req, res) => {
         orderBy: { incident: { date: 'asc'} },
     });
 
+    /*
     if (involvements.length === 0)
-        throw AppError(404, "По данному запросу ничего не найдено.");
+        throw new AppError(404, "По данному запросу ничего не найдено.");
+    */
 
     const data = involvements.map(involvement => ({
         involvement_id: involvement.involvement_id,
@@ -81,9 +86,11 @@ export const getInvolvements = asyncHandler(async (req, res) => {
         orderBy: { incident: { date: 'asc'} },
     });
 
+    /*
     if (involvements.length === 0)
-        throw AppError(404, "Пока не добавлено ни одного статуса для участников происшествий.");
-
+        throw new AppError(404, "Пока не добавлено ни одного статуса для участников происшествий.");
+    */
+    
     const data = involvements.map(involvement => ({
         involvement_id: involvement.involvement_id,
         incident_id: involvement.incident.incident_id,
@@ -143,7 +150,7 @@ export const updateInvolvement = asyncHandler(async (req, res) => {
 
     const existingInvolvement = getInvolvementById(id);
     if (!existingInvolvement) 
-        throw AppError(404, "Статус участника не найден", [{ id }]);
+        throw new AppError(404, "Статус участника не найден", [{ id }]);
     
     const { incident_id, participant_id, status } = req.body;
 
@@ -189,7 +196,7 @@ export const deleteInvolvement = asyncHandler(async (req, res) => {
 
     const existingInvolvement = getInvolvementById(id);
     if (!existingInvolvement) 
-        throw AppError(404, "Статус участника не найден", [{ id }]);
+        throw new AppError(404, "Статус участника не найден", [{ id }]);
 
     const deletedInvolvement = await prisma.involvement.delete({
         where: { involvement_id: id }

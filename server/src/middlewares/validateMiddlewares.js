@@ -16,10 +16,14 @@ export const validateRequest = (schema, source = 'body') => {
                 message: issue.message,
             }));
             
-            return next(new AppError('Ошибка валидации', errors));
+            return next(new AppError(400, 'Ошибка валидации', errors));
         }
 
-        req[source] = result.data;
+        if (source === 'query') {
+            req.validatedQuery = result.data;
+        } else {
+            req[source] = result.data;
+        }
         next();
     };
 };

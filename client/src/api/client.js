@@ -10,92 +10,110 @@ const apiClient = axios.create({
 export const api = {
     authRegister: async (userData) => {
         let response = await apiClient.post('/auth/register', userData);
-        return response.data;
+        return response;
     },
     authLogin: async (userData) => {
         let response = await apiClient.post('/auth/login', userData);
-        localStorage.setItem('accessToken', response.data.accessToken);
-        localStorage.setItem('refreshToken', response.data.refreshToken);
-        return response.data;
+        // localStorage.setItem('accessToken', response.data.accessToken);
+        // localStorage.setItem('refreshToken', response.data.refreshToken);
+        return response;
     },
     authRefreshToken: async (refreshToken) => {
         let response = await apiClient.post('/auth/refresh', refreshToken);
-        return response.data;
+        return response;
     },
     authLogout: async () => {
-        let response = await apiClient.get('/auth/logout');
-        return response.data;
-    },
-    getMain: async () => {
-        let response = await apiClient.get('/auth/');
-        return response.data;
+        let response = await apiClient.delete('/auth/logout');
+        return response;
     },
     getProfile: async () => {
         let response = await apiClient.get('/auth/profile');
-        return response.data;
+        return response;
     },
     redactProfile: async (userData) => {
         let response = await apiClient.patch('/auth/profile', userData);
-        return response.data;
+        return response;
     },
-    getIncidents: async (startData, endData) => {
-        let response = await apiClient.get('/auth/incidents', startData, endData);
-        return response.data;
+    getIncidents: async (startData, endData ) => {
+        let response = await apiClient.get(
+            '/auth/incidents', 
+            { params: { startData, endData} }
+        );
+        return response;
     },
-    postIncidents: async (incidentData) => {
+    postIncident: async (incidentData) => {
         let response = await apiClient.post('/auth/incidents', incidentData);
-        return response.data;
+        return response;
     },
     redactIncident: async (incidentId, incidentData) => {
         let response = await apiClient.patch(`/auth/incidents/${incidentId}`, incidentData);
-        return response.data;
+        return response;
     },
     deleteIncident: async (incidentId) => {
         let response = await apiClient.delete(`/auth/incidents/${incidentId}`);
-        return response.data;
+        return response;
+    },
+    getIncidentTypes: async () => {
+        let response = await apiClient.get('/auth/incidents/form/types');
+        return response;
+    },
+    getIncidentStatuses: async () => {
+        let response = await apiClient.get('/auth/incidents/form/statuses');
+        return response;
     },
     getParticipants: async () => {
-        let response = await apiClient.get('/auth/participants');
-        return response.data;
+        let response = await apiClient.get(
+            '/auth/participants', 
+        );
+        return response;
     },
-    getParticipantsQuery: async (query) => {
-        let response = await apiClient.get(`/auth/participants/search?q=${query}`);
-        return response.data;
+    getParticipantsQuery: async (q) => {
+        let response = await apiClient.get(
+            `/auth/participants/search`,
+            { params: { q } }
+        );
+        return response;
     },
-    postParticipants: async (participantData) => {
+    postParticipant: async (participantData) => {
         let response = await apiClient.post('/auth/participants', participantData);
-        return response.data;
+        return response;
     },
     redactParticipants: async (participantId, participantData) => {
         let response = await apiClient.patch(`/auth/participants/${participantId}`, participantData);
-        return response.data;
+        return response;
     },
-    deleteParticipants: async (participantId) => {
+    deleteParticipant: async (participantId) => {
         let response = await apiClient.delete(`/auth/participants/${participantId}`);
-        return response.data;
+        return response;
     },
     getInvolvements: async () => {
-        let response = await apiClient.get('/auth/involvements');
-        return response.data;
+        let response = await apiClient.get(
+            '/auth/involvements',
+        );
+        return response;
     },
-    getInvolvementsQuery: async (query) => {
-        let response = await apiClient.get(`/auth/involvements/search?q=${query}`);
-        return response.data;
+    getInvolvementsQuery: async (q) => {
+        let response = await apiClient.get(
+            `/auth/involvements/search`,
+            { params: { q } }
+        );
+        return response;
     },
-    postInvolvements: async (involvementData) => {
+    postInvolvement: async (involvementData) => {
         let response = await apiClient.post('/auth/involvements', involvementData);
-        return response.data;
+        return response;
     },
     redactInvolvements: async (involvementId, involvementData) => {
         let response = await apiClient.patch(`/auth/involvements/${involvementId}`, involvementData);
-        return response.data;
+        return response;
     },
-    deleteInvolvements: async (involvementId) => {
+    deleteInvolvement: async (involvementId) => {
         let response = await apiClient.delete(`/auth/involvements/${involvementId}`);
-        return response.data;
+        return response;
     },
 };
 
+/*
 apiClient.interceptors.request.use(
     (config) => {
         let accessToken = localStorage.getItem('accessToken');
@@ -108,7 +126,9 @@ apiClient.interceptors.request.use(
     },
     (error) => Promise.reject(error)
 );
+*/
 
+/*
 apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
@@ -155,5 +175,60 @@ apiClient.interceptors.response.use(
         }
         
         return Promise.reject(error)
+    }
+);
+*/
+
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
+apiClient.interceptors.response.use(
+    response => response,
+    async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/refresh') {
+            if (isRefreshing) {
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                }).then(token => {
+                    originalRequest.headers.Authorization = `Bearer ${token}`;
+                    return apiClient(originalRequest);
+                }).catch(err => Promise.reject(err));
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                const { data } = await axios.post('/api/auth/refresh', {}, { withCredentials: true });
+                const newAccessToken = data.accessToken;
+
+                apiClient.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
+                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+
+                processQueue(null, newAccessToken);
+                return apiClient(originalRequest);
+            } catch (refreshError) {
+                processQueue(refreshError, null);
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
+            } finally {
+                isRefreshing = false;
+            }
+        }
+
+        return Promise.reject(error);
     }
 );

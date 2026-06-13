@@ -1,12 +1,15 @@
-import { registry } from "../openapi";
-import { errorResponseSchema } from "../../validators/index.js";
-import { redactProfileSchema, profileResponseSchema } from "../../validators/profileValidator.js";
+import { registry } from "../openapi.js";
+import { z, errorResponseSchema } from "../../validators/index.js";
+import { 
+    redactProfileSchema, 
+    profileResponseSchema 
+} from "../../validators/profileValidator.js";
 
 registry.registerPath({
     method: 'get',
     path: '/api/profile',
     summary: 'Получение информации о профиле пользователя',
-    tags: ['Incidents'],
+    tags: ['Profile'],
     responses: {
         200: {
             description: 'Информация о профиле пользователя',
@@ -39,7 +42,7 @@ registry.registerPath({
     method: 'patch',
     path: '/api/profile',
     summary: 'Обновление информации о профиле пользователя',
-    tags: ['Incidents'],
+    tags: ['Profile'],
     request: {
         body: {
             required: true,

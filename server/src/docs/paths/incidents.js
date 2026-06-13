@@ -1,13 +1,11 @@
-import { z } from "zod";
-import { registry } from "../openapi";
+import { z, idParamsSchema, errorResponseSchema } from "../../validators/index.js";
+import { registry } from "../openapi.js";
 import { 
     getIncidentsQuerySchema, 
     createIncidentSchema, 
     updateIncidentSchema, 
     incidentSchema 
-} from "../../validators/incidentsValidator";
-import { idParamsSchema } from '../../validators/index.js';
-import { errorResponseSchema } from "../../validators/index.js";
+} from "../../validators/incidentsValidator.js";
 
 registry.registerPath({
     method: 'get',
@@ -44,6 +42,7 @@ registry.registerPath({
     path: '/api/incidents',
     summary: 'Добавление нового происшествия',
     tags: ['Incidents'],
+    security: [{ bearerAuth: [] }],
     request: {
         body: {
             required: true,

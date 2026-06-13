@@ -1,4 +1,5 @@
-import { z, iso } from 'zod';
+import { iso } from 'zod';
+import { z } from './index.js';
 import { Role } from '@prisma/client';
 
 export const redactProfileSchema = z.object({

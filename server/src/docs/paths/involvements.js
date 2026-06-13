@@ -1,6 +1,5 @@
-import { registry } from "../openapi";
-import { idParamsSchema } from '../../validators/index.js';
-import { errorResponseSchema } from "../../validators/index.js";
+import { registry } from "../openapi.js";
+import { z, idParamsSchema, errorResponseSchema } from '../../validators/index.js';
 import {
     searchInvolvementsQuerySchema,
     createInvolvementSchema,

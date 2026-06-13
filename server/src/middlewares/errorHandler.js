@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
 
 export const errorHandler = (err, req, res, next) => {
-    const status = err.status || 500;
-    const response = {
+    let status = err.status || 500;
+    let response = {
         error: err.message || 'Внутренняя ошибка сервера',
     };
     if (err.details) {

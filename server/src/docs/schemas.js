@@ -1,9 +1,8 @@
-// import { z } from 'zod';
-import { registry } from './openapi';
-import { incidentSchema } from '../validators/incidentsValidator';
-import { participantSchema } from '../validators/participantsValidator';
-import { involvementSchema } from '../validators/involvementsValidator';
-import { profileResponseSchema } from '../validators/profileValidator';
+import { registry } from './openapi.js';
+import { incidentSchema } from '../validators/incidentsValidator.js';
+import { participantSchema } from '../validators/participantsValidator.js';
+import { involvementSchema } from '../validators/involvementsValidator.js';
+import { profileResponseSchema } from '../validators/profileValidator.js';
 
 registry.register('User', profileResponseSchema);
 registry.register('Incident', incidentSchema);

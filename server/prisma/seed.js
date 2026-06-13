@@ -67,13 +67,12 @@ async function main() {
         skipDuplicates: true,
     });
 
-    const routes = await prisma.route.createManyAndReturn({
+    const newRoutesCount = await prisma.route.createMany({
         data: [
             {name: '/api/auth/registration'},
             {name: '/api/auth/login'},
             {name: '/api/auth/logout'},
             {name: '/api/auth/refresh'},
-            {name: '/api/'},
             {name: '/api/profile'},
             {name: '/api/incidents'},
             {name: '/api/incidents/:id'},
@@ -81,17 +80,19 @@ async function main() {
             {name: '/api/incidents/form/statuses'},
             {name: '/api/participants'},
             {name: '/api/participants/:id'},
-            {name: '/api/participants/search?q={query}'},
+            {name: '/api/participants/search'},
             {name: '/api/involvements'},
             {name: '/api/involvements/:id'},
-            {name: '/api/involvements/search?q={query}'},
+            {name: '/api/involvements/search'},
         ],
         skipDuplicates: true,
     });
 
-    console.log(routes.find(r => r.name == '/api/logout'));
+    const routes = await prisma.route.findMany();
 
-    const permissions = await prisma.permission.createManyAndReturn({
+    console.log(routes);
+
+    const newPermissionsCount = await prisma.permission.createMany({
         data: [
             {name: 'logout:delete', method: Method.DELETE, route_id: routes.find(r => r.name == '/api/auth/logout').route_id},
             {name: 'profile:read', method: Method.GET, route_id: routes.find(r => r.name == '/api/profile').route_id},
@@ -102,6 +103,7 @@ async function main() {
             {name: 'incidents_types:read', method: Method.GET, route_id: routes.find(r => r.name == '/api/incidents/form/types').route_id},
             {name: 'incidents_statuses:read', method: Method.GET, route_id: routes.find(r => r.name == '/api/incidents/form/statuses').route_id},
             {name: 'participants:read', method: Method.GET, route_id: routes.find(r => r.name == '/api/participants').route_id},
+            {name: 'participants:search', method: Method.GET, route_id: routes.find(r => r.name == '/api/participants/search').route_id},
             {name: 'participants:write', method: Method.POST, route_id: routes.find(r => r.name == '/api/participants').route_id},
             {name: 'participant:redact', method: Method.PATCH, route_id: routes.find(r => r.name == '/api/participants/:id').route_id},
             {name: 'participant:delete', method: Method.DELETE, route_id: routes.find(r => r.name == '/api/participants/:id').route_id},
@@ -111,6 +113,8 @@ async function main() {
         ],
         skipDuplicates: true,
     });
+
+    const permissions = await prisma.permission.findMany();
 
     const viewerPerms = [
         'logout:delete', 

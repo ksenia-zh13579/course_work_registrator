@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as incidentsController from '../controllers/incidentsController.js';
-import { authenticate, authorize } from '../middleware/authMiddleware.js';
+import * as incidentsController from '../controllers/incidentsControllers.js';
+import { authenticate, authorize } from '../middlewares/authMiddlewares.js';
 import { validateRequest } from '../middlewares/validateMiddlewares.js';
 import { getIncidentsQuerySchema, createIncidentSchema, updateIncidentSchema } from '../validators/incidentsValidator.js';
 import { idParamsSchema } from '../validators/index.js';
@@ -24,7 +24,7 @@ incidentsRouter.post(
 incidentsRouter.patch(
     '/:id',
     authenticate,
-    authorize('incidents:redact'),
+    authorize('incident:redact'),
     validateRequest(idParamsSchema, 'params'),
     validateRequest(updateIncidentSchema),
     incidentsController.updateIncident
@@ -33,7 +33,7 @@ incidentsRouter.patch(
 incidentsRouter.delete(
     '/:id',
     authenticate,
-    authorize('incidents:delete'),
+    authorize('incident:delete'),
     validateRequest(idParamsSchema, 'params'),
     incidentsController.deleteIncident
 );

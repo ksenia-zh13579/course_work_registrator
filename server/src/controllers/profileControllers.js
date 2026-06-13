@@ -19,19 +19,20 @@ export const getProfile = asyncHandler(async (req, res) => {
 export const updateProfile = asyncHandler(async (req, res) => {
     const new_data = req.body;
     
-    const isOldPassValid = await verifyPassword(new_data.old_password, req.user.passwordHash);
+    const isOldPassValid = await verifyPassword(new_data.old_password, req.user.password_hash);
     if (!isOldPassValid) {
-        throw AppError(401, "Неверный прежний пароль!");
+        throw new AppError(401, "Неверный прежний пароль!");
     }
 
     if (new_data.username !== undefined && new_data.username !== req.user.username) {
         const otherExistingUser = await getUserByUsername(new_data.username);
         if (otherExistingUser)
-            throw AppError(409, "Такое имя пользователя уже занято!");
+            throw new AppError(409, "Такое имя пользователя уже занято!");
     }
 
-    if (new_data.new_password !== undefined)
-        const newPassHash = await getPasswordHash(new_data.new_password, 10);
+    const newPassHash = new_data.new_password !== undefined
+    ? await getPasswordHash(new_data.new_password, 10)
+    : undefined;
 
     const updatedUser = await prisma.user.update({
         where: {user_id: req.user.user_id},
@@ -41,7 +42,6 @@ export const updateProfile = asyncHandler(async (req, res) => {
             name: new_data.name || req.user.name,
             patronymic: new_data.patronymic || req.user.patronymic || null,
             password_hash: newPassHash || req.user.password_hash,
-            updatedAt: new Date().toISOString()
         }
     });
 

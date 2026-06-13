@@ -1,4 +1,5 @@
-import { z, iso } from 'zod';
+import { iso } from 'zod';
+import { z } from './index.js';
 import { InvStatus } from '@prisma/client';
 
 export const searchInvolvementsQuerySchema = z.object({
@@ -22,7 +23,7 @@ export const updateInvolvementSchema = z.object({
 export const involvementSchema = z.object({
     involvement_id: z.number().int().positive().openapi({ example: '123' }),
     incident_id: z.number().int().positive().openapi({ example: '1' }),
-    incident_date: z.iso.date('Дата должна быть в формате ISO 8601').openapi({ example: '2023-01-01' }),
+    incident_date: z.iso.date('Дата должна быть в формате ISO 8601').transform(val => new Date(val)).openapi({ example: '2023-01-01' }),
     incident_type: z.string().openapi({ example: 'Нападение' }),
     participant_id: z.number().int().positive().openapi({ example: '1' }),
     participant_full_name: z.string().openapi({ example: 'Иванов Н. А.' }),

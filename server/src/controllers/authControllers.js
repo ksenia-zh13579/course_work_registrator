@@ -1,7 +1,7 @@
 import { verifyPassword, getPasswordHash } from '../utils/passwordActions.js';
 import { getUserByUsername } from '../utils/BDgetters.js';
 import { prisma } from '../client.js';
-import { generateAccessToken, generateRefreshToken } from '../services/auth.service.js';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwtTokens.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { AppError } from '../utils/errors.js';
 
@@ -24,7 +24,7 @@ export const login = asyncHandler(async (req, res) => {
     await prisma.refreshToken.create({
         data: {
             token: jti,
-            userId: user.user_id,
+            user_id: user.user_id,
             expiresAt,
         },
     });
@@ -75,7 +75,7 @@ export const register = asyncHandler(async (req, res) => {
     await prisma.refreshToken.create({
         data: {
             token: jti,
-            userId: user.user_id,
+            user_id: user.user_id,
             expiresAt,
         },
     });
@@ -120,25 +120,25 @@ export const refresh = asyncHandler(async (req, res) => {
 
     if (!storedToken || storedToken.expiresAt < new Date()) {
         if (storedToken) {
-            await prisma.refreshToken.deleteMany({ where: { userId: storedToken.userId } });
+            await prisma.refreshToken.deleteMany({ where: { user_id: storedToken.user_id } });
         }
         throw new AppError(401, 'Refresh-токен недействителен или истёк');
     }
 
     await prisma.refreshToken.delete({ where: { id: storedToken.id } });
 
-    const { token: newRefreshToken, jti: newJti, expiresInMs } = generateRefreshToken(storedToken.userId);
+    const { token: newRefreshToken, jti: newJti, expiresInMs } = generateRefreshToken(storedToken.user_id);
     const expiresAt = new Date(Date.now() + expiresInMs);
 
     await prisma.refreshToken.create({
         data: {
             token: newJti,
-            userId: storedToken.userId,
+            user_id: storedToken.user_id,
             expiresAt,
         },
     });
 
-    const newAccessToken = generateAccessToken(storedToken.userId);
+    const newAccessToken = generateAccessToken(storedToken.user_id);
 
     res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
@@ -158,7 +158,7 @@ export const logout = asyncHandler(async (req, res) => {
             const payload = verifyRefreshToken(tokenFromCookie);
             await prisma.refreshToken.deleteMany({ where: { token: payload.jti } });
         } catch (err) {
-            
+            // Игнорируем ошибки при удалении токена (токен может быть истекшим или невалидным)
         }
     }
 

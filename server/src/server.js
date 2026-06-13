@@ -2,9 +2,10 @@ import express from "express";
 import cors from "cors";
 import { router } from "./routes/index.js";
 import cookieParser from 'cookie-parser';
-import { errorHandler } from "./middleware/errorHandler.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 import swaggerUi from 'swagger-ui-express';
 import { generateSwaggerDoc } from './docs/openapi.js';
+import './docs/registerAll.js';
 
 const app = express();
 
@@ -16,7 +17,16 @@ app.use(cors({
 }));
 
 const swaggerSpec = generateSwaggerDoc();
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.get('/api-docs-json', (req, res) => {
+    res.json(swaggerSpec);
+});
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+        persistAuthorization: true,  
+    },
+}));
 
 app.use(express.json());
 app.use(cookieParser());

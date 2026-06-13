@@ -1,6 +1,6 @@
 import {Router} from 'express';
-import * as authController from '../controllers/authController.js';
-import { authenticate, authorize } from '../middleware/authMiddleware.js';
+import * as authController from '../controllers/authControllers.js';
+import { authenticate, authorize, authenticateForLogout } from '../middlewares/authMiddlewares.js';
 import { validateRequest } from '../middlewares/validateMiddlewares.js';
 import { registerSchema, loginSchema } from '../validators/authValidator.js';
 
@@ -11,7 +11,7 @@ authRouter.post('/login', validateRequest(loginSchema), authController.login);
 authRouter.post('/refresh', authController.refresh);
 authRouter.delete(
     '/logout', 
-    authenticate,
+    authenticateForLogout,
     authorize('logout:delete'),
     authController.logout
 );

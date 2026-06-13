@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as involvementsController from '../controllers/involvementsController.js';
-import { authenticate, authorize } from '../middleware/authMiddleware.js';
+import * as involvementsController from '../controllers/involvementsControllers.js';
+import { authenticate, authorize } from '../middlewares/authMiddlewares.js';
 import { validateRequest } from '../middlewares/validateMiddlewares.js';
 import { searchInvolvementsQuerySchema, createInvolvementSchema, updateInvolvementSchema } from '../validators/involvementsValidator.js';
 import { idParamsSchema } from '../validators/index.js';
@@ -20,6 +20,7 @@ involvementsRouter.get(
 
 involvementsRouter.post(
     '/',
+    authenticate,
     authorize('involvements:write'),
     validateRequest(createInvolvementSchema),
     involvementsController.createInvolvement
@@ -27,7 +28,8 @@ involvementsRouter.post(
 
 involvementsRouter.patch(
     '/:id',
-    authorize('involvements:redact'),
+    authenticate,
+    authorize('involvement:redact'),
     validateRequest(idParamsSchema, 'params'),
     validateRequest(updateInvolvementSchema),
     involvementsController.updateInvolvement
@@ -35,7 +37,8 @@ involvementsRouter.patch(
 
 involvementsRouter.delete(
     '/:id',
-    authorize('involvements:delete'),
+    authenticate,
+    authorize('involvement:delete'),
     validateRequest(idParamsSchema, 'params'),
     involvementsController.deleteInvolvement
 );

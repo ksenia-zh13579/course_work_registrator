@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import * as participantsController from '../controllers/participantsController.js';
-import { authenticate, authorize } from '../middleware/authMiddleware.js';
+import * as participantsController from '../controllers/participantsControllers.js';
+import { authenticate, authorize } from '../middlewares/authMiddlewares.js';
 import { validateRequest } from '../middlewares/validateMiddlewares.js';
 import { searchParticipantsQuerySchema, createParticipantSchema, updateParticipantSchema } from '../validators/participantsValidator.js';
 import { idParamsSchema } from '../validators/index.js';
@@ -11,9 +11,9 @@ participantsRouter.use(authenticate);
 
 participantsRouter.get(
     '/search',
-    authorize('participants:read'),
+    authorize('participants:search'),
     validateRequest(searchParticipantsQuerySchema, 'query'),
-    participantController.searchParticipants
+    participantsController.searchParticipants
 );
 
 participantsRouter.get(
@@ -31,7 +31,7 @@ participantsRouter.post(
 
 participantsRouter.patch(
     '/:id',
-    authorize('participants:redact'),
+    authorize('participant:redact'),
     validateRequest(idParamsSchema, 'params'),
     validateRequest(updateParticipantSchema),
     participantsController.updateParticipant
@@ -39,7 +39,7 @@ participantsRouter.patch(
 
 participantsRouter.delete(
     '/:id',
-    authorize('participants:delete'),
+    authorize('participant:delete'),
     validateRequest(idParamsSchema, 'params'),
     participantsController.deleteParticipant
 );

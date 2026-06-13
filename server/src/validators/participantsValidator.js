@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './index.js';
 
 export const searchParticipantsQuerySchema = z.object({
     q: z.string().trim().openapi({ example: 'Иванов Н А' }),
