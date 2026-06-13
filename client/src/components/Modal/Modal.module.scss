@@ -1,0 +1,91 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal {
+  display: flex;
+  width: 100%;
+  max-width: 450px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  border-radius: 30px;
+  border: 2px solid var(--color-primary-dark);
+  background: #fff;
+}
+
+.formHeader {
+  display: flex;
+  padding: 5px 0 10px 0;
+  justify-content: space-between;
+  align-items: flex-start;
+  align-self: stretch;
+  border-bottom: 1px solid var(--color-text-muted);
+  gap: 10px;
+}
+
+.formTitle {
+  flex: 1;
+  font-family: var(--font-main);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: normal;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    opacity: 0.7;
+  }
+}
+
+.formBody {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-self: stretch;
+  width: 100%;
+}
+
+.formActions {
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .formTitle {
+    font-size: 22px;
+  }
+
+  .formActions {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
+    }
+  }
+}
