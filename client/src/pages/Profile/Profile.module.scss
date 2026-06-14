@@ -1,0 +1,51 @@
+.profileContent {
+  display: flex;
+  padding: 20px 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.profileRow {
+  display: flex;
+  padding: 10px 0;
+  align-items: center;
+  gap: 10px;
+  align-self: stretch;
+}
+
+.profileLabel {
+  font-family: var(--font-main);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: normal;
+}
+
+.profileValue {
+  font-family: var(--font-main);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--color-text);
+  line-height: normal;
+}
+
+.errorMsg {
+  font-family: var(--font-main);
+  font-size: 18px;
+  color: var(--color-primary);
+}
+
+.successMsg {
+  font-family: var(--font-main);
+  font-size: 18px;
+  color: #228B22;
+}
+
+@media (max-width: 768px) {
+  .profileLabel,
+  .profileValue {
+    font-size: 18px;
+  }
+}

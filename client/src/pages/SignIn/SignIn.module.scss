@@ -1,0 +1,13 @@
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-self: stretch;
+  width: 100%;
+}
+
+.errorMsg {
+  font-family: var(--font-main);
+  font-size: 18px;
+  color: var(--color-primary);
+}

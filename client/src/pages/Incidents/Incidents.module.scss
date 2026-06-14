@@ -1,0 +1,14 @@
+.tabsBar {
+  display: flex;
+  padding-top: 10px;
+  align-items: flex-start;
+  gap: 10px;
+  align-self: stretch;
+  border-bottom: 0.5px solid var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .tabsBar {
+    flex-wrap: wrap;
+  }
+}
