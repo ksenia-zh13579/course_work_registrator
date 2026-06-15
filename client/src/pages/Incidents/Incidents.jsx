@@ -7,6 +7,8 @@ import styles from './Incidents.module.scss';
 export default function Incidents() {
   const { isAdmin, isAuthenticated } = useAuth();
   const [incidents, setIncidents] = useState([]);
+  const [incidentTypes, setIncidentTypes] = useState([]);
+  const [incidentStatuses, setIncidentStatuses] = useState([]);
   const [tab, setTab] = useState('reviewed');
   const [startDate, setStartDate] = useState('01.04.2026');
   const [endDate, setEndDate] = useState('01.05.2026');
@@ -21,7 +23,27 @@ export default function Incidents() {
 
   useEffect(() => {
     loadIncidents();
+    loadIncidentTypes();
+    loadIncidentStatuses();
   }, [tab, startDate, endDate]);
+
+  const loadIncidentTypes = async () => {
+    try {
+      const res = await api.getIncidentTypes();
+      setIncidentTypes(res.data);
+    } catch (err) {
+      console.error('Error loading incident types:', err);
+    }
+  };
+
+  const loadIncidentStatuses = async () => {
+    try {
+      const res = await api.getIncidentStatuses();
+      setIncidentStatuses(res.data);
+    } catch (err) {
+      console.error('Error loading incident statuses:', err);
+    }
+  };
 
   const loadIncidents = async () => {
     try {
@@ -176,9 +198,11 @@ export default function Incidents() {
             required
           >
             <option value="">Выберите тип</option>
-            <option value="ДТП">ДТП</option>
-            <option value="Кража">Кража</option>
-            <option value="Драка">Драка</option>
+            {incidentTypes.map(type => (
+              <option key={type.id} value={type.name || type.id}>
+                {type.name || type.id}
+              </option>
+            ))}
           </select>
 
           <label className="form-label">Дата:</label>
@@ -209,8 +233,11 @@ export default function Incidents() {
                 onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
               >
                 <option value="">Выберите статус</option>
-                <option value="На рассмотрении">На рассмотрении</option>
-                <option value="Рассмотрено">Рассмотрено</option>
+                {incidentStatuses.map(status => (
+                  <option key={status.id} value={status.name || status.id}>
+                    {status.description || status.name || status.id}
+                  </option>
+                ))}
               </select>
             </>
           )}
