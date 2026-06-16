@@ -1,225 +1,225 @@
-# Регистратор - Client Application
+# Регистратор - клиентская часть приложения
 
-A React-based client application for registering and viewing incidents with role-based access control.
+Клиентское приложение на React для регистрации и просмотра происшествий с разграничением доступа по ролям.
 
-## Project Structure
+## Структура проекта
 
 ```
 src/
 ├── api/
-│   └── client.js           # Axios API client with interceptors
+│   └── client.js           # API клиент на Axios с интерсепторами
 ├── components/
-│   ├── Header/             # Navigation header component
-│   ├── Footer/             # Footer with author info
-│   ├── Modal/              # Reusable form modal component
-│   └── ProtectedRoute/     # Route protection for authenticated/admin users
+│   ├── Header/             # компонент шапки с навигацией
+│   ├── Footer/             # компонент футера с информацией об авторе
+│   ├── Modal/              # переиспользуемое модальное окно для форм
+│   └── ProtectedRoute/     # защита маршрутов для авторизованных пользователей и администраторов
 ├── context/
-│   └── AuthContext.jsx     # Authentication context and hooks
+│   └── AuthContext.jsx     # контекст авторизации и хуки
 ├── pages/
-│   ├── Main/               # Home/landing page
-│   ├── SignIn/             # Login page
-│   ├── Registration/       # User registration page
-│   ├── Profile/            # User profile management
-│   ├── Incidents/          # Incident listing and management
-│   ├── Involvements/       # Participant involvement statuses
-│   └── Participants/       # Admin-only participant management
+│   ├── Main/               # главная страница
+│   ├── SignIn/             # страница входа
+│   ├── Registration/       # страница регистрации
+│   ├── Profile/            # управление профилем пользователя
+│   ├── Incidents/          # список и управление происшествиями
+│   ├── Involvements/       # статусы участников
+│   └── Participants/       # управление участниками (только админ)
 ├── styles/
-│   └── global.scss         # Global styles and CSS variables
-├── App.jsx                 # Main app component with routing
-├── main.jsx                # React entry point
-└── index.css               # Base CSS reset
+│   └── global.scss         # глобальные стили и CSS-переменные
+├── App.jsx                 # основной компонент приложения с маршрутизацией
+├── main.jsx                # точка входа React
+└── index.css               # базовый CSS-сброс
 ```
 
-## Features
+## Возможности
 
-### Authentication
-- Sign in / Registration with username, name, patronymic, and password
-- Auth context with automatic profile loading
-- Protected routes for authenticated users and admins
-- Token refresh interceptor
+### Аутентификация
+- Вход / регистрация по логину, имени, отчеству и паролю
+- Контекст авторизации с автоматической загрузкой профиля
+- Защищённые маршруты для авторизованных пользователей и админов
+- Интерсептор для обновления токена
 
-### Pages
+### Страницы
 
 #### Main (/)
-- Welcome message with role-specific content
-- Links to other pages
-- Different content for Guest, User, and Admin roles
+- Приветствие с содержимым, зависящим от роли
+- Ссылки на другие страницы
+- Разный контент для гостя, пользователя и администратора
 
-#### Sign In (/signin)
-- Login form with username and password
-- Redirects to main page on success
-- Link to registration page
+#### Sign In (/login)
+- Форма входа по логину и паролю
+- Перенаправление на главную страницу при успешном входе
+- Ссылка на страницу регистрации
 
 #### Registration (/register)
-- User registration form
-- Fields: login, first name, last name, patronymic, password
-- Automatic redirect to sign in after registration
+- Форма регистрации пользователя
+- Поля: логин, имя, фамилия, отчество, пароль
+- Автоматическое перенаправление на вход после регистрации
 
-#### Profile (/profile) - Protected
-- Display user information
-- Edit profile modal with form validation
-- Change password functionality
-- Admin badge for admin users
+#### Profile (/profile) — защищённый
+- Отображение данных пользователя
+- Модальное окно редактирования профиля с валидацией
+- Возможность смены пароля
+- Значок администратора для админов
 
 #### Incidents (/incidents)
-- List of incidents with tabs (pending/reviewed)
-- Date range filtering
-- Add new incident button (authenticated users)
-- Edit/delete incidents (edit for users, delete for admins)
-- Fields: type, date, description, status
+- Список происшествий с вкладками (на рассмотрении/рассмотренные)
+- Фильтрация по диапазону дат
+- Кнопка добавления нового происшествия (для авторизованных пользователей)
+- Редактирование/удаление происшествий (только для администраторов)
+- Поля: тип, дата, описание, статус, регистрационный номер (при открытии дела)
 
 #### Involvements (/involvements)
-- List of incident participant statuses
-- Search functionality
-- Add new status (admin only)
-- Edit/delete statuses (admin only)
-- Statuses: Suspect, Witness, Victim, Culprit
+- Список статусов участников происшествий
+- Поиск по участнику и типу происшествия
+- Добавление статуса (только админ)
+- Редактирование/удаление статусов (только админ)
+- Типы статусов: подозреваемый, свидетель, потерпевший, виновник
 
-#### Participants (/participants) - Admin Only
-- List of incident participants
-- Search by name
-- Add participant
-- Edit/delete participant info
-- Fields: last name, first name, patronymic, address, convictions
+#### Participants (/participants) — только для администраторов
+- Список участников происшествий
+- Поиск по ФИО
+- Добавление участника
+- Редактирование/удаление данных участника
+- Поля: фамилия, имя, отчество, адрес, судимости
 
-### Components
+### Компоненты
 
 #### Header
-- Logo and navigation links
-- Active page indicator
-- User avatar with username
-- Admin badge for admin users
-- Logout button
+- Логотип и навигация по страницам
+- Индикатор активной страницы
+- Иконка пользователя с именем
+- Значок для администраторов
+- Кнопка выхода
 
 #### Footer
-- Copyright information
-- Author details
-- Contact email
+- Информация об авторских правах
+- Информация об авторе
+- Контактный email
 
 #### Modal
-- Reusable form container with header, body, and actions
-- Close button (X)
-- Submit and Cancel buttons
-- Click-outside and Escape key to close
+- Переиспользуемый контейнер формы с заголовком, телом и кнопками для действий
+- Кнопка закрытия (X)
+- Кнопки Отправить и Отмена
+- Закрытие по клику за пределами и по клавише Escape
 
 #### ProtectedRoute
-- Prevents unauthorized access
-- Redirects to sign in if not authenticated
-- Redirects to home if not admin (when required)
+- Предотвращает неавторизованный доступ
+- Перенаправляет на вход, если нет авторизации
+- Перенаправляет на главную, если требуется администраторские права и пользователь не является админом
 
 #### AuthContext
-- User state management
-- Login/register/logout functions
-- Profile update function
-- Admin and authentication status indicators
+- Управление состоянием пользователя
+- Функции входа/регистрации/выхода
+- Функция обновления профиля
+- Индикаторы наличия статуса администратора и авторизации
 
-### Styling
+### Стилизация
 
-#### CSS Variables
-- Colors: primary (#910407), primary-dark (#7B0204), link (#38097E)
-- Backgrounds: header (#DDD2D2), page (#FFF5F5), footer (#EDC2CD)
-- Fonts: 'LXGW WenKai TC', 'Jeju Gothic'
+#### CSS-переменные
+- Цвета: primary (#910407), primary-dark (#7B0204), link (#38097E)
+- Фоны: header (#DDD2D2), page (#FFF5F5), footer (#EDC2CD)
+- Шрифты: 'LXGW WenKai TC', 'Jeju Gothic'
 
-#### Design System
-- BEM-style class naming
-- SCSS modules for component-specific styles
-- Global styles for reusable elements
-- Responsive design with media queries
-- Flexbox and CSS Grid layouts
+#### Система дизайна
+- Именование классов в стиле BEM
+- SCSS-модули для стилизации компонентов
+- Глобальные стили для переиспользуемых элементов
+- Адаптивная верстка через media queries
+- Макеты на Flexbox и CSS Grid
 
-### Key Styles Applied
-- `.page-container` - Main content area
-- `.btn` - Button styling
-- `.form-input`, `.form-select`, `.form-label` - Form elements
-- `.data-table`, `.table-row`, `.table-cell` - Table layout
-- `.nav-btn`, `.user-avatar-wrapper` - Navigation elements
-- `.modal`, `.form-header`, `.form-body`, `.form-actions` - Modal structure
+### Основные применённые стили
+- `.page-container` — основной контейнер содержимого
+- `.btn` — стили кнопок
+- `.form-input`, `.form-select`, `.form-label` — элементы форм
+- `.data-table`, `.table-row`, `.table-cell` — элементы таблиц
+- `.nav-btn`, `.user-avatar-wrapper` — элементы навигации
+- `.modal`, `.form-header`, `.form-body`, `.form-actions` — структура модального окна
 
-## Setup & Running
+## Установка и запуск
 
-### Install Dependencies
+### Установка зависимостей
 ```bash
 npm install
 ```
 
-### Development Server
+### Запуск в режиме разработки
 ```bash
 npm run dev
 ```
 
-### Build for Production
+### Сборка для продакшена
 ```bash
 npm run build
 ```
 
-### Preview Production Build
+### Просмотр продакшен-сборки
 ```bash
 npm run preview
 ```
 
-## API Endpoints
+## Эндпойнты API
 
-The client communicates with the backend API at `/api`:
+Клиент взаимодействует с бэкендом через `/api`:
 
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login user
-- `GET /auth/profile` - Get current user profile
-- `PATCH /auth/profile` - Update user profile
-- `POST /auth/logout` - Logout user
-- `GET /auth/incidents` - Get incidents with date filtering
-- `POST /auth/incidents` - Create new incident
-- `PATCH /auth/incidents/:id` - Update incident
-- `DELETE /auth/incidents/:id` - Delete incident
-- `GET /auth/participants` - Get all participants
-- `POST /auth/participants` - Add participant
-- `PATCH /auth/participants/:id` - Update participant
-- `DELETE /auth/participants/:id` - Delete participant
-- `GET /auth/involvements` - Get all involvements
-- `POST /auth/involvements` - Add involvement
-- `PATCH /auth/involvements/:id` - Update involvement
-- `DELETE /auth/involvements/:id` - Delete involvement
+- `POST /auth/register` — регистрация нового пользователя
+- `POST /auth/login` — вход пользователя
+- `GET /auth/profile` — получение профиля текущего пользователя
+- `PATCH /auth/profile` — обновление профиля пользователя
+- `POST /auth/logout` — выход из системы
+- `GET /auth/incidents` — получение происшествий с фильтрацией по датам
+- `POST /auth/incidents` — создание нового происшествия
+- `PATCH /auth/incidents/:id` — редактирование происшествия
+- `DELETE /auth/incidents/:id` — удаление происшествия
+- `GET /auth/participants` — получение всех участников
+- `POST /auth/participants` — добавление участника
+- `PATCH /auth/participants/:id` — обновление участника
+- `DELETE /auth/participants/:id` — удаление участника
+- `GET /auth/involvements` — получение всех статусов участников
+- `POST /auth/involvements` — добавление статуса участника
+- `PATCH /auth/involvements/:id` — обновление статуса участника
+- `DELETE /auth/involvements/:id` — удаление статуса участника
 
-## Technologies
+## Технологии
 
-- **React** 19.2 - UI library
-- **React Router** 7.17 - Client-side routing
-- **Axios** 1.16 - HTTP client
-- **SCSS** 1.101 - Styling
-- **Vite** 8.0 - Build tool
-- **ESLint** - Code quality
+- **React** 19.2 — библиотека для интерфейса
+- **React Router** 7.17 — маршрутизация на клиенте
+- **Axios** 1.16 — HTTP-клиент
+- **SCSS** 1.101 — стилизация
+- **Vite** 8.0 — сборка проекта
+- **ESLint** — проверка качества кода
 
-## Authentication Flow
+## Процесс авторизации
 
-1. User starts at sign in page
-2. Provides credentials and submits
-3. Backend validates and returns tokens
-4. AuthContext stores user data and tokens
-5. Protected routes check authentication status
-6. User can navigate to authorized pages
-7. API requests include auth tokens via interceptors
-8. On logout, tokens cleared and user redirected to sign in
+1. Пользователь открывает страницу входа
+2. Вводит учётные данные и отправляет форму
+3. Бэкенд проверяет данные и возвращает токены
+4. AuthContext сохраняет данные пользователя и токены
+5. Защищённые маршруты проверяют статус авторизации
+6. Пользователь получает доступ к разрешённым страницам
+7. API-запросы отправляются с токенами через интерсепторы
+8. При выходе токены очищаются и происходит перенаправление на вход
 
-## Responsive Design
+## Адаптивность
 
-All pages are responsive with breakpoints at 768px for tablets and mobile devices. The layout adapts:
-- Header navigation wraps on smaller screens
-- Table content may scroll horizontally
-- Modal adjusts max-width for mobile
-- Font sizes reduce on smaller viewports
-- Padding and gaps adjust for compact display
+Все страницы адаптивны с точкой перехода на 768px для планшетов и мобильных устройств. Адаптивность макета:
+- навигация шапки переносится на узких экранах
+- содержимое таблиц может прокручиваться горизонтально
+- модальные окна изменяют максимальную ширину на мобильных
+- размеры шрифтов уменьшаются на маленьких экранах
+- отступы и интервалы становятся компактнее
 
-## Error Handling
+## Обработка ошибок
 
-- Form validation on client side
-- API errors displayed to users
-- Failed authentication redirects to sign in
-- 401 errors trigger token refresh
-- Network errors show user-friendly messages
+- Валидация форм на клиенте
+- Ошибки API отображаются пользователю
+- Неуспешная авторизация приводит к перенаправлению на вход
+- Ответ 401 вызывает обновление токена
+- Сетевые ошибки показывают понятные сообщения
 
-## Notes
+## Примечания
 
-- The application uses cookies for session management (withCredentials: true)
-- Form data for all modals is validated before submission
-- Table IDs can have edit/delete action links
-- Search and filter operations are debounced in some cases
-- Admin features hidden from non-admin users
+- Приложение использует куки для управления сессией (`withCredentials: true`)
+- Данные форм всех модальных окон проверяются перед отправкой
+- В таблицах в полях с ID могут быть ссылки для редактирования и удаления
+- В некоторых местах поиск и фильтрация работают с задержкой
+- Администраторские функции скрываются от неадминов
