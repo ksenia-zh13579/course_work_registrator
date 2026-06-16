@@ -7,10 +7,10 @@ export default function Registration() {
   const { register } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    login: '',
-    firstName: '',
-    lastName: '',
-    middleName: '',
+    username: '',
+    name: '',
+    surname: '',
+    patronymic: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -46,8 +46,8 @@ export default function Registration() {
           <input
             className="form-input"
             type="text"
-            name="login"
-            value={form.login}
+            name="username"
+            value={form.username}
             onChange={handleChange}
             placeholder="user123"
             required
@@ -59,8 +59,8 @@ export default function Registration() {
           <input
             className="form-input"
             type="text"
-            name="firstName"
-            value={form.firstName}
+            name="name"
+            value={form.name}
             onChange={handleChange}
             placeholder="Елена"
             required
@@ -72,8 +72,8 @@ export default function Registration() {
           <input
             className="form-input"
             type="text"
-            name="lastName"
-            value={form.lastName}
+            name="surname"
+            value={form.surname}
             onChange={handleChange}
             placeholder="Смирнова"
             required
@@ -83,8 +83,8 @@ export default function Registration() {
           <input
             className="form-input"
             type="text"
-            name="middleName"
-            value={form.middleName}
+            name="patronymic"
+            value={form.patronymic}
             onChange={handleChange}
             placeholder="Ивановна"
           />

@@ -5,27 +5,31 @@ import Modal from '../../components/Modal/Modal';
 import styles from './Incidents.module.scss';
 
 export default function Incidents() {
+  function formatDate(date) {
+    let toDate = new Date(date);
+
+    const year = toDate.getFullYear();
+    const month = String(toDate.getMonth() + 1).padStart(2, '0');
+    const day = String(toDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   const { isAdmin, isAuthenticated } = useAuth();
   const [incidents, setIncidents] = useState([]);
   const [incidentTypes, setIncidentTypes] = useState([]);
   const [incidentStatuses, setIncidentStatuses] = useState([]);
   const [tab, setTab] = useState('reviewed');
-  const [startDate, setStartDate] = useState('01.04.2026');
-  const [endDate, setEndDate] = useState('01.05.2026');
+  const [startDate, setStartDate] = useState('1900-01-01');
+  const [endDate, setEndDate] = useState('2026-06-16');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    type: '',
+    incident_type_id: '',
     date: '',
     description: '',
-    status: '',
+    incident_status_id: '',
   });
 
-  useEffect(() => {
-    loadIncidents();
-    loadIncidentTypes();
-    loadIncidentStatuses();
-  }, [tab, startDate, endDate]);
 
   const loadIncidentTypes = async () => {
     try {
@@ -48,9 +52,10 @@ export default function Incidents() {
   const loadIncidents = async () => {
     try {
       const res = await api.getIncidents(startDate, endDate);
-      const filtered = res.data.filter(inc => {
-        if (tab === 'reviewed') return inc.status === 'Рассмотрено' || inc.status === 'reviewed';
-        return inc.status === 'На рассмотрении' || inc.status === 'pending';
+      const incidents = res.data;
+      const filtered = incidents.filter(inc => {
+        if (tab === 'reviewed') return inc.incident_status !== 'На рассмотрении';
+        return inc.incident_status === 'На рассмотрении';
       });
       setIncidents(filtered);
     } catch (err) {
@@ -58,30 +63,48 @@ export default function Incidents() {
     }
   };
 
+  useEffect(() => {
+    loadIncidents();
+    loadIncidentTypes();
+    loadIncidentStatuses();
+  }, [tab, startDate, endDate]);
+
   const handleOpenModal = (incident = null) => {
     if (incident) {
-      setEditingId(incident.id);
+      setEditingId(incident.incident_id);
+      const typeObj = incidentTypes.find(t => t.name === incident.incident_type);
+      const statusObj = incidentStatuses.find(s => s.description === incident.incident_status);
       setFormData({
-        type: incident.type || '',
+        incident_type_id: typeObj?.incident_type_id || '',
         date: incident.date || '',
         description: incident.description || '',
-        status: incident.status || '',
+        incident_status_id: statusObj?.incident_status_id || 1,
       });
     } else {
       setEditingId(null);
-      setFormData({ type: '', date: '', description: '', status: '' });
+      setFormData({ incident_type_id: '', date: '', description: '', incident_status_id: 1 });
     }
     setShowModal(true);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      console.log(formData);
+      const payload = {
+        ...formData,
+        incident_type_id: formData.incident_type_id ? Number(formData.incident_type_id) : undefined,
+        incident_status_id: formData.incident_status_id ? Number(formData.incident_status_id) : undefined,
+        date: formData.date || undefined,
+      };
+
       if (editingId) {
-        await api.redactIncident(editingId, formData);
+        await api.redactIncident(editingId, payload);
       } else {
-        await api.postIncident(formData);
+        await api.postIncident(payload);
       }
+
       setShowModal(false);
       await loadIncidents();
     } catch (err) {
@@ -122,14 +145,14 @@ export default function Incidents() {
       <div className="page-header-row">
         <span className="page-header-label">Показывать результаты, начиная с</span>
         <input
-          type="text"
+          type="date"
           className="date-filter-select"
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
         />
         <span className="page-header-label">по</span>
         <input
-          type="text"
+          type="date"
           className="date-filter-select"
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
@@ -149,13 +172,14 @@ export default function Incidents() {
           <div className="table-cell table-cell--head">Описание</div>
           <div className="table-cell table-cell--head">Дата</div>
           <div className="table-cell table-cell--head">Статус</div>
+          <div className="table-cell table-cell--head">Номер дела</div>
         </div>
 
         {incidents.map(incident => (
-          <div key={incident.id} className="table-row">
+          <div key={incident.incident_id} className="table-row">
             <div className="table-cell table-cell--id">
-              <span>{incident.id}</span>
-              {(isAdmin || isAuthenticated) && (
+              <span>{incident.incident_id}</span>
+              {(isAdmin) && (
                 <>
                   <button
                     className="text-link"
@@ -163,22 +187,21 @@ export default function Incidents() {
                   >
                     Редактировать
                   </button>
-                  {isAdmin && (
-                    <button
-                      className="text-link"
-                      style={{ color: '#e74c3c' }}
-                      onClick={() => handleDelete(incident.id)}
-                    >
-                      Удалить
-                    </button>
-                  )}
+                  <button
+                    className="text-link"
+                    style={{ color: '#e74c3c' }}
+                    onClick={() => handleDelete(incident.incident_id)}
+                  >
+                    Удалить
+                  </button>
                 </>
               )}
             </div>
-            <div className="table-cell">{incident.type}</div>
+            <div className="table-cell">{incident.incident_type}</div>
             <div className="table-cell">{incident.description}</div>
-            <div className="table-cell">{incident.date}</div>
-            <div className="table-cell">{incident.status}</div>
+            <div className="table-cell">{formatDate(incident.date)}</div>
+            <div className="table-cell">{incident.incident_status}</div>
+            <div className="table-cell">{incident.reg_number || ""}</div>
           </div>
         ))}
       </div>
@@ -192,27 +215,27 @@ export default function Incidents() {
           <label className="form-label">Тип происшествия:</label>
           <select
             className="form-select"
-            name="type"
-            value={formData.type}
-            onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value }))}
+            name="incident_type_id"
+            value={formData.incident_type_id}
+            onChange={(e) => setFormData(prev => ({ ...prev, incident_type_id: e.target.value ? Number(e.target.value) : '' }))}
             required
           >
             <option value="">Выберите тип</option>
             {incidentTypes.map(type => (
-              <option key={type.id} value={type.name || type.id}>
-                {type.name || type.id}
+              <option key={type.incident_type_id} value={type.incident_type_id}>
+                {type.name}
               </option>
             ))}
           </select>
 
           <label className="form-label">Дата:</label>
-          <input
-            className="form-input"
-            type="text"
-            value={formData.date}
-            onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-            placeholder="01.01.2026"
-          />
+            <input
+              className="form-input"
+              type="date"
+              value={formData.date}
+              onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+              required
+            />
 
           <label className="form-label">Описание:</label>
           <input
@@ -228,14 +251,14 @@ export default function Incidents() {
               <label className="form-label">Статус:</label>
               <select
                 className="form-select"
-                name="status"
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                name="incident_status_id"
+                value={formData.incident_status_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, incident_status_id: e.target.value ? Number(e.target.value) : '' }))}
               >
                 <option value="">Выберите статус</option>
                 {incidentStatuses.map(status => (
-                  <option key={status.id} value={status.name || status.id}>
-                    {status.description || status.name || status.id}
+                  <option key={status.incident_status_id} value={status.incident_status_id}>
+                    {status.description}
                   </option>
                 ))}
               </select>

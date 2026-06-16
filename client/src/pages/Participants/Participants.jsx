@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 import Modal from '../../components/Modal/Modal';
-import styles from './Participants.module.scss';
+// import styles from './Participants.module.scss';
 
 export default function Participants() {
   const { isAdmin } = useAuth();
@@ -11,49 +11,47 @@ export default function Participants() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    lastName: '',
-    firstName: '',
-    middleName: '',
+    surname: '',
+    name: '',
+    patronymic: '',
     address: '',
-    convictions: '0',
+    crimial_records: 0,
   });
-
-  useEffect(() => {
-    loadParticipants();
-  }, []);
 
   const loadParticipants = async () => {
     try {
-      if (searchQuery) {
-        const res = await api.getParticipantsQuery(searchQuery);
-        setParticipants(res.data);
-      } else {
-        const res = await api.getParticipants();
-        setParticipants(res.data);
-      }
+      const res = searchQuery
+        ? await api.getParticipantsQuery(searchQuery)
+        : await api.getParticipants();
+      const items = res.data?.data ?? res.data;
+      setParticipants(items);
     } catch (err) {
       console.error('Error loading participants:', err);
     }
   };
 
+  useEffect(() => {
+    loadParticipants();
+  }, []);
+
   const handleOpenModal = (participant = null) => {
     if (participant) {
-      setEditingId(participant.id);
+      setEditingId(participant.participant_id);
       setFormData({
-        lastName: participant.lastName || '',
-        firstName: participant.firstName || '',
-        middleName: participant.middleName || '',
+        surname: participant.surname || '',
+        name: participant.name || '',
+        patronymic: participant.patronymic || '',
         address: participant.address || '',
-        convictions: participant.convictions || '0',
+        crimial_records: participant.crimial_records || 0,
       });
     } else {
       setEditingId(null);
       setFormData({
-        lastName: '',
-        firstName: '',
-        middleName: '',
+        surname: '',
+        name: '',
+        patronymic: '',
         address: '',
-        convictions: '0',
+        crimial_records: 0,
       });
     }
     setShowModal(true);
@@ -125,9 +123,9 @@ export default function Participants() {
         </div>
 
         {participants.map(participant => (
-          <div key={participant.id} className="table-row">
+          <div key={participant.participant_id} className="table-row">
             <div className="table-cell table-cell--id">
-              <span>{participant.id}</span>
+              <span>{participant.participant_id}</span>
               <button
                 className="text-link"
                 onClick={() => handleOpenModal(participant)}
@@ -137,16 +135,16 @@ export default function Participants() {
               <button
                 className="text-link"
                 style={{ color: '#e74c3c' }}
-                onClick={() => handleDelete(participant.id)}
+                onClick={() => handleDelete(participant.participant_id)}
               >
                 Удалить
               </button>
             </div>
-            <div className="table-cell">{participant.lastName}</div>
-            <div className="table-cell">{participant.firstName}</div>
-            <div className="table-cell">{participant.middleName}</div>
+            <div className="table-cell">{participant.surname}</div>
+            <div className="table-cell">{participant.name}</div>
+            <div className="table-cell">{participant.patronymic || ''}</div>
             <div className="table-cell">{participant.address}</div>
-            <div className="table-cell">{participant.convictions}</div>
+            <div className="table-cell">{participant.crimial_records}</div>
           </div>
         ))}
       </div>
@@ -161,8 +159,8 @@ export default function Participants() {
           <input
             className="form-input"
             type="text"
-            value={formData.lastName}
-            onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+            value={formData.surname}
+            onChange={(e) => setFormData(prev => ({ ...prev, surname: e.target.value }))}
             placeholder="Смирнова"
             required
           />
@@ -171,8 +169,8 @@ export default function Participants() {
           <input
             className="form-input"
             type="text"
-            value={formData.firstName}
-            onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
             placeholder="Елена"
             required
           />
@@ -181,8 +179,8 @@ export default function Participants() {
           <input
             className="form-input"
             type="text"
-            value={formData.middleName}
-            onChange={(e) => setFormData(prev => ({ ...prev, middleName: e.target.value }))}
+            value={formData.patronymic}
+            onChange={(e) => setFormData(prev => ({ ...prev, patronymic: e.target.value }))}
             placeholder="Александровна"
           />
 
@@ -199,8 +197,8 @@ export default function Participants() {
           <label className="form-label">Количество судимостей:</label>
           <select
             className="form-select"
-            value={formData.convictions}
-            onChange={(e) => setFormData(prev => ({ ...prev, convictions: e.target.value }))}
+            value={formData.crimial_records}
+            onChange={(e) => setFormData(prev => ({ ...prev, crimial_records: parseInt(e.target.value) }))}
           >
             <option value="0">0</option>
             <option value="1">1</option>

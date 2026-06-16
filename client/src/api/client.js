@@ -2,114 +2,154 @@ import axios from 'axios';
 
 const apiClient = axios.create({
     baseURL: '/api',
-    withCredentials: true, 
+    withCredentials: true,
     timeout: 5000,
     headers: { 'Content-Type': 'application/json' },
 });
 
+const setAccessToken = (token) => {
+    if (token) {
+        apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+        localStorage.setItem('accessToken', token);
+    }
+};
+
+const clearAccessToken = () => {
+    delete apiClient.defaults.headers.common.Authorization;
+    localStorage.removeItem('accessToken');
+};
+
+const existingToken = localStorage.getItem('accessToken');
+if (existingToken) {
+    apiClient.defaults.headers.common.Authorization = `Bearer ${existingToken}`;
+}
+
 export const api = {
     authRegister: async (userData) => {
         let response = await apiClient.post('/auth/register', userData);
-        return response;
+        setAccessToken(response.data.accessToken);
+        console.log(response.data);
+        return response.data;
     },
     authLogin: async (userData) => {
         let response = await apiClient.post('/auth/login', userData);
-        // localStorage.setItem('accessToken', response.data.accessToken);
-        // localStorage.setItem('refreshToken', response.data.refreshToken);
-        return response;
+        setAccessToken(response.data.accessToken);
+        console.log(response.data);
+        return response.data;
     },
     authRefreshToken: async (refreshToken) => {
         let response = await apiClient.post('/auth/refresh', refreshToken);
-        return response;
+        console.log(response.data);
+        return response.data;
     },
     authLogout: async () => {
+        clearAccessToken();
         let response = await apiClient.delete('/auth/logout');
-        return response;
+        console.log(response.data);
+        return response.data;
     },
     getProfile: async () => {
-        let response = await apiClient.get('/auth/profile');
-        return response;
+        let response = await apiClient.get('/profile');
+        console.log(response.data);
+        return response.data;
     },
     redactProfile: async (userData) => {
-        let response = await apiClient.patch('/auth/profile', userData);
-        return response;
+        let response = await apiClient.patch('/profile', userData);
+        console.log(response.data);
+        return response.data;
     },
-    getIncidents: async (startData, endData ) => {
+    getIncidents: async (startDate, endDate ) => {
         let response = await apiClient.get(
-            '/auth/incidents', 
-            { params: { startData, endData} }
+            '/incidents', 
+            { params: { startDate, endDate} }
         );
-        return response;
+        console.log(response.data);
+        return response.data;
     },
     postIncident: async (incidentData) => {
-        let response = await apiClient.post('/auth/incidents', incidentData);
-        return response;
+        let response = await apiClient.post('/incidents', incidentData);
+        console.log(response.data);
+        return response.data;
     },
     redactIncident: async (incidentId, incidentData) => {
-        let response = await apiClient.patch(`/auth/incidents/${incidentId}`, incidentData);
-        return response;
+        let response = await apiClient.patch(`/incidents/${incidentId}`, incidentData);
+        console.log(response.data);
+        return response.data;
     },
     deleteIncident: async (incidentId) => {
-        let response = await apiClient.delete(`/auth/incidents/${incidentId}`);
-        return response;
+        let response = await apiClient.delete(`/incidents/${incidentId}`);
+        console.log(response.data);
+        return response.data;
     },
     getIncidentTypes: async () => {
-        let response = await apiClient.get('/auth/incidents/form/types');
-        return response;
+        let response = await apiClient.get('/incidents/form/types');
+        console.log(response.data);
+        return response.data;
     },
     getIncidentStatuses: async () => {
-        let response = await apiClient.get('/auth/incidents/form/statuses');
-        return response;
+        let response = await apiClient.get('/incidents/form/statuses');
+        console.log(response.data);
+        return response.data;
     },
     getParticipants: async () => {
         let response = await apiClient.get(
-            '/auth/participants', 
+            '/participants', 
         );
-        return response;
+        console.log(response.data);
+        return response.data;
     },
     getParticipantsQuery: async (q) => {
         let response = await apiClient.get(
-            `/auth/participants/search`,
+            `/participants/search`,
             { params: { q } }
         );
-        return response;
+        console.log(response.data);
+        return response.data;
     },
     postParticipant: async (participantData) => {
-        let response = await apiClient.post('/auth/participants', participantData);
-        return response;
+        let response = await apiClient.post('/participants', participantData);
+        console.log(response.data);
+        return response.data;
     },
     redactParticipants: async (participantId, participantData) => {
-        let response = await apiClient.patch(`/auth/participants/${participantId}`, participantData);
-        return response;
+        let response = await apiClient.patch(`/participants/${participantId}`, participantData);
+        console.log(response.data);
+        return response.data;
     },
     deleteParticipant: async (participantId) => {
-        let response = await apiClient.delete(`/auth/participants/${participantId}`);
-        return response;
+        let response = await apiClient.delete(`/participants/${participantId}`);
+        console.log(response.data);
+        return response.data;
     },
     getInvolvements: async () => {
         let response = await apiClient.get(
-            '/auth/involvements',
+            '/involvements',
         );
-        return response;
+        console.log(response.data);
+        return response.data;
     },
     getInvolvementsQuery: async (q) => {
         let response = await apiClient.get(
-            `/auth/involvements/search`,
+            `/involvements/search`,
             { params: { q } }
         );
-        return response;
+        console.log(response.data);
+        return response.data;
     },
     postInvolvement: async (involvementData) => {
-        let response = await apiClient.post('/auth/involvements', involvementData);
-        return response;
+        let response = await apiClient.post('/involvements', involvementData);
+        console.log(response.data);
+        return response.data;
     },
     redactInvolvements: async (involvementId, involvementData) => {
-        let response = await apiClient.patch(`/auth/involvements/${involvementId}`, involvementData);
-        return response;
+        let response = await apiClient.patch(`/involvements/${involvementId}`, involvementData);
+        console.log(response.data);
+        return response.data;
     },
     deleteInvolvement: async (involvementId) => {
-        let response = await apiClient.delete(`/auth/involvements/${involvementId}`);
-        return response;
+        let response = await apiClient.delete(`/involvements/${involvementId}`);
+        console.log(response.data);
+        return response.data;
     },
 };
 

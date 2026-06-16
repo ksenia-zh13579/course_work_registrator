@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 import Modal from '../../components/Modal/Modal';
-import styles from './Involvements.module.scss';
+// import styles from './Involvements.module.scss';
 
 export default function Involvements() {
   const { isAdmin } = useAuth();
@@ -11,40 +11,46 @@ export default function Involvements() {
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    incidentId: '',
-    participantId: '',
+    incident_id: '',
+    participant_id: '',
     status: '',
   });
 
-  useEffect(() => {
-    loadInvolvements();
-  }, []);
+  const statusStrings = {
+    'WITNESS': 'Свидетель', 
+    'SUSPECT': 'Подозреваемый',
+    'GUILTY': 'Виновник',
+    'VICTIM': 'Потерпевший'
+  };
 
   const loadInvolvements = async () => {
     try {
-      if (searchQuery) {
-        const res = await api.getInvolvementsQuery(searchQuery);
-        setInvolvements(res.data);
-      } else {
-        const res = await api.getInvolvements();
-        setInvolvements(res.data);
-      }
+      const res = searchQuery
+        ? await api.getInvolvementsQuery(searchQuery)
+        : await api.getInvolvements();
+
+      const items = res.data?.data ?? res.data;
+      setInvolvements(items);
     } catch (err) {
       console.error('Error loading involvements:', err);
     }
   };
 
+  useEffect(() => {
+    loadInvolvements();
+  }, []);
+
   const handleOpenModal = (involvement = null) => {
     if (involvement) {
-      setEditingId(involvement.id);
+      setEditingId(involvement.involvement_id);
       setFormData({
-        incidentId: involvement.incidentId || '',
-        participantId: involvement.participantId || '',
+        incident_id: involvement.incident_id || '',
+        participant_id: involvement.participant_id || '',
         status: involvement.status || '',
       });
     } else {
       setEditingId(null);
-      setFormData({ incidentId: '', participantId: '', status: '' });
+      setFormData({ incident_id: '', participant_id: '', status: '' });
     }
     setShowModal(true);
   };
@@ -52,10 +58,18 @@ export default function Involvements() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log(formData);
+      const payload = {
+        ...formData,
+        incident_id: formData.incident_id ? Number(formData.incident_id) : undefined,
+        participant_id: formData.participant_id ? Number(formData.participant_id) : undefined,
+        status: formData.status || undefined,
+      };
+
       if (editingId) {
-        await api.redactInvolvements(editingId, formData);
+        await api.redactInvolvements(editingId, payload);
       } else {
-        await api.postInvolvement(formData);
+        await api.postInvolvement(payload);
       }
       setShowModal(false);
       await loadInvolvements();
@@ -108,9 +122,9 @@ export default function Involvements() {
         </div>
 
         {involvements.map(inv => (
-          <div key={inv.id} className="table-row">
+          <div key={inv.involvement_id} className="table-row">
             <div className="table-cell table-cell--id">
-              <span>{inv.incidentId}</span>
+              <span>{inv.incident_id}</span>
               {isAdmin && (
                 <>
                   <button
@@ -122,17 +136,17 @@ export default function Involvements() {
                   <button
                     className="text-link"
                     style={{ color: '#e74c3c' }}
-                    onClick={() => handleDelete(inv.id)}
+                    onClick={() => handleDelete(inv.involvement_id)}
                   >
                     Удалить
                   </button>
                 </>
               )}
             </div>
-            <div className="table-cell">{inv.incidentType}</div>
-            <div className="table-cell">{inv.participantId}</div>
-            <div className="table-cell">{inv.participantName}</div>
-            <div className="table-cell">{inv.status}</div>
+            <div className="table-cell">{inv.incident_type}</div>
+            <div className="table-cell">{inv.participant_id}</div>
+            <div className="table-cell">{inv.full_name}</div>
+            <div className="table-cell">{statusStrings[inv.status]}</div>
           </div>
         ))}
       </div>
@@ -147,8 +161,8 @@ export default function Involvements() {
           <input
             className="form-input"
             type="text"
-            value={formData.incidentId}
-            onChange={(e) => setFormData(prev => ({ ...prev, incidentId: e.target.value }))}
+            value={formData.incident_id}
+            onChange={(e) => setFormData(prev => ({ ...prev, incident_id: e.target.value }))}
             placeholder="12341"
             required
           />
@@ -157,8 +171,8 @@ export default function Involvements() {
           <input
             className="form-input"
             type="text"
-            value={formData.participantId}
-            onChange={(e) => setFormData(prev => ({ ...prev, participantId: e.target.value }))}
+            value={formData.participant_id}
+            onChange={(e) => setFormData(prev => ({ ...prev, participant_id: e.target.value }))}
             placeholder="765"
             required
           />
@@ -171,10 +185,10 @@ export default function Involvements() {
             required
           >
             <option value="">Выберите статус</option>
-            <option value="Подозреваемый">Подозреваемый</option>
-            <option value="Свидетель">Свидетель</option>
-            <option value="Потерпевший">Потерпевший</option>
-            <option value="Виновник">Виновник</option>
+            <option value={"SUSPECT"}>{statusStrings["SUSPECT"]}</option>
+            <option value={"WITNESS"}>{statusStrings["WITNESS"]}</option>
+            <option value={"VICTIM"}>{statusStrings["VICTIM"]}</option>
+            <option value={"GUILTY"}>{statusStrings["GUILTY"]}</option>
           </select>
         </Modal>
       )}

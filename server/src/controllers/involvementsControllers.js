@@ -32,6 +32,7 @@ export const searchInvolvements = asyncHandler(async (req, res) => {
         include: {
             incident: { 
                 select: {
+                    incident_id: true,
                     incident_type: { select: {name: true} },
                     date: true
                 } 
@@ -71,6 +72,7 @@ export const getInvolvements = asyncHandler(async (req, res) => {
         include: {
             incident: { 
                 select: {
+                    incident_id: true,
                     incident_type: { select: {name: true} },
                     date: true
                 } 
@@ -118,6 +120,7 @@ export const createInvolvement = asyncHandler(async (req, res) => {
         include: {
             incident: { 
                 select: {
+                    incident_id: true,
                     incident_type: { select: {name: true} },
                     date: true
                 } 
@@ -164,6 +167,7 @@ export const updateInvolvement = asyncHandler(async (req, res) => {
         include: {
             incident: { 
                 select: {
+                    incident_id: true,
                     incident_type: { select: {name: true} },
                     date: true
                 } 

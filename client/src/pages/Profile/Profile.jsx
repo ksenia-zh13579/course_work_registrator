@@ -1,18 +1,20 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 import Modal from '../../components/Modal/Modal';
 import styles from './Profile.module.scss';
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    middleName: user?.middleName || '',
-    oldPassword: '',
-    password: '',
+    name: user?.name || '',
+    surname: user?.surname || '',
+    patronymic: user?.patronymic || '',
+    old_password: '',
+    new_password: '',
     passwordConfirm: '',
   });
   const [error, setError] = useState('');
@@ -27,21 +29,25 @@ export default function Profile() {
     setError('');
     setSuccess('');
 
-    if (formData.password && formData.password !== formData.passwordConfirm) {
+    if (formData.new_password && formData.new_password !== formData.passwordConfirm) {
       setError('Пароли не совпадают');
       return;
     }
 
     try {
       const updatePayload = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        middleName: formData.middleName,
+        name: formData.name,
+        surname: formData.surname,
+        patronymic: formData.patronymic,
+        old_password: formData.old_password,
       };
-      if (formData.password) {
-        updatePayload.oldPassword = formData.oldPassword;
-        updatePayload.password = formData.password;
+      if (formData.new_password) {
+        updatePayload.new_password = formData.new_password;
       }
+
+      Object.keys(updatePayload).forEach(key => {
+        if (updatePayload[key] === '') delete updatePayload[key];
+      });
 
       const res = await api.redactProfile(updatePayload);
       updateUser(res.data);
@@ -53,6 +59,16 @@ export default function Profile() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err);
+      setError('Не удалось выйти из системы');
+    }
+  };
+
   return (
     <div className="page-container">
       <h1 className="page-title page-title--accent">Профиль</h1>
@@ -60,19 +76,19 @@ export default function Profile() {
       <div className={styles.profileContent}>
         <div className={styles.profileRow}>
           <span className={styles.profileLabel}>Имя пользователя:</span>
-          <span className={styles.profileValue}>{user?.login || user?.username || 'N/A'}</span>
+          <span className={styles.profileValue}>{user?.username || 'N/A'}</span>
         </div>
         <div className={styles.profileRow}>
           <span className={styles.profileLabel}>Фамилия:</span>
-          <span className={styles.profileValue}>{user?.lastName || 'N/A'}</span>
+          <span className={styles.profileValue}>{user?.surname || 'N/A'}</span>
         </div>
         <div className={styles.profileRow}>
           <span className={styles.profileLabel}>Имя:</span>
-          <span className={styles.profileValue}>{user?.firstName || 'N/A'}</span>
+          <span className={styles.profileValue}>{user?.name || 'N/A'}</span>
         </div>
         <div className={styles.profileRow}>
           <span className={styles.profileLabel}>Отчество:</span>
-          <span className={styles.profileValue}>{user?.middleName || 'N/A'}</span>
+          <span className={styles.profileValue}>{user?.patronymic || 'N/A'}</span>
         </div>
         <div className={styles.profileRow}>
           <span className={styles.profileLabel}>Роль:</span>
@@ -85,6 +101,9 @@ export default function Profile() {
       <button className="btn btn-primary" onClick={() => setShowModal(true)}>
         Редактировать
       </button>
+      <button className="btn btn-primary" onClick={handleLogout}>
+        Выйти
+      </button>
 
       {error && <p className={styles.errorMsg}>{error}</p>}
       {success && <p className={styles.successMsg}>{success}</p>}
@@ -92,14 +111,14 @@ export default function Profile() {
       {showModal && (
         <Modal title="Редактировать профиль" onClose={() => setShowModal(false)} onSubmit={handleSubmit}>
           <label className="form-label">Имя пользователя:</label>
-          <input className="form-input" type="text" value={user?.login} disabled />
+          <input className="form-input" type="text" value={user?.username} disabled />
 
           <label className="form-label">Фамилия:</label>
           <input
             className="form-input"
             type="text"
-            name="lastName"
-            value={formData.lastName}
+            name="surname"
+            value={formData.surname}
             onChange={handleChange}
           />
 
@@ -107,8 +126,8 @@ export default function Profile() {
           <input
             className="form-input"
             type="text"
-            name="firstName"
-            value={formData.firstName}
+            name="name"
+            value={formData.name}
             onChange={handleChange}
           />
 
@@ -116,8 +135,8 @@ export default function Profile() {
           <input
             className="form-input"
             type="text"
-            name="middleName"
-            value={formData.middleName}
+            name="patronymic"
+            value={formData.patronymic}
             onChange={handleChange}
           />
 
@@ -125,8 +144,8 @@ export default function Profile() {
           <input
             className="form-input"
             type="password"
-            name="oldPassword"
-            value={formData.oldPassword}
+            name="old_password"
+            value={formData.old_password}
             onChange={handleChange}
             placeholder="Введите старый пароль"
           />
@@ -135,10 +154,10 @@ export default function Profile() {
           <input
             className="form-input"
             type="password"
-            name="password"
-            value={formData.password}
+            name="new_password"
+            value={formData.new_password}
             onChange={handleChange}
-            placeholder="Оставьте пусто, если не хотите менять"
+            placeholder="Оставьте пустым, если не хотите менять"
           />
 
           <label className="form-label">Подтвердите новый пароль:</label>

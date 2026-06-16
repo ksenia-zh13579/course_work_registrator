@@ -6,7 +6,7 @@ import styles from './SignIn.module.scss';
 export default function SignIn() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ login: '', password: '' });
+  const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -40,8 +40,8 @@ export default function SignIn() {
           <input
             className="form-input"
             type="text"
-            name="login"
-            value={form.login}
+            name="username"
+            value={form.username}
             onChange={handleChange}
             placeholder="user123"
             required
