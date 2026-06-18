@@ -8,10 +8,10 @@
     "start": "node src/server.js",
     "migrate": "prisma migrate dev",
     "seed": "node prisma/seed.js",
-    "test": "cross-env NODE_ENV=test jest --runInBand",
-    "test:watch": "cross-env NODE_ENV=test jest --watch  --runInBand",
-    "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration --runInBand",
-    "test:coverage": "cross-env NODE_ENV=test jest --coverage --runInBand"
+    "test": "cross-env NODE_ENV=test jest --runInBand --forceExit",
+    "test:watch": "cross-env NODE_ENV=test jest --watch  --runInBand --forceExit",
+    "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration --runInBand --forceExit",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --runInBand --forceExit"
   },
   "keywords": [],
   "author": "",

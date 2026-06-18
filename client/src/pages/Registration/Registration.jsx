@@ -26,7 +26,7 @@ export default function Registration() {
     setLoading(true);
     try {
       await register(form);
-      navigate('/signin');
+      navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'Ошибка регистрации');
     } finally {
@@ -111,7 +111,7 @@ export default function Registration() {
 
         <p className="auth-card-footer">
           Уже есть аккаунт?{' '}
-          <Link to="/signin" className="text-link text-link--inline">Войти</Link>
+          <Link to="/login" className="text-link text-link--inline">Войти</Link>
         </p>
       </div>
     </div>

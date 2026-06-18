@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import ProtectedRoute from '../../../components/ProtectedRoute';
+import ProtectedRoute from '../../../components/ProtectedRoute/ProtectedRoute.jsx';
 import { useAuth } from '../../../context/AuthContext';
 
 vi.mock('../../../context/AuthContext', () => ({
@@ -8,7 +8,7 @@ vi.mock('../../../context/AuthContext', () => ({
 }));
 
 describe('ProtectedRoute', () => {
-    test('редиректит на /login для неавторизованного пользователя', () => {
+    test('редиректит на /signin для неавторизованного пользователя', () => {
         useAuth.mockReturnValue({
             user: null,
             isAuthenticated: false,
@@ -17,8 +17,12 @@ describe('ProtectedRoute', () => {
         render(
             <MemoryRouter initialEntries={['/protected']}>
                 <Routes>
-                    <Route path="/login" element={<div>Login Page</div>} />
-                    <Route path="/protected" element={<ProtectedRoute><div>Protected</div></ProtectedRoute>} />
+                    <Route path="/signin" element={<div>Login Page</div>} />
+                    <Route path="/protected" element={
+                        <ProtectedRoute>
+                            <div>Protected</div>
+                        </ProtectedRoute>
+                    } />
                 </Routes>
             </MemoryRouter>
         );
@@ -34,7 +38,11 @@ describe('ProtectedRoute', () => {
         render(
             <MemoryRouter initialEntries={['/protected']}>
                 <Routes>
-                    <Route path="/protected" element={<ProtectedRoute><div>Protected Content</div></ProtectedRoute>} />
+                    <Route path="/protected" element={
+                        <ProtectedRoute>
+                            <div>Protected Content</div>
+                        </ProtectedRoute>
+                    } />
                 </Routes>
             </MemoryRouter>
         );

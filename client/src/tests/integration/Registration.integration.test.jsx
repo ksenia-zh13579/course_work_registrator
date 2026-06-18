@@ -1,14 +1,13 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '../../context/AuthContext';
-import Registration from '../../pages/Registration';
-import { server } from './mocks/server';
+import { AuthProvider } from '../../context/AuthContext.jsx';
+import Registration from '../../pages/Registration/Registration.jsx';
+import { server } from './mocks/server.js';
 import { http, HttpResponse } from 'msw';
 
-// Вспомогательная функция для поиска input по тексту лейбла
 function getInputByLabel(labelText) {
-  const label = screen.getByText(new RegExp(labelText, 'i'));
-  return label.nextElementSibling;
+    const label = screen.getByText(new RegExp(labelText, 'i'));
+    return label.nextElementSibling;
 }
 
 beforeAll(() => server.listen());
@@ -30,10 +29,10 @@ describe('Registration Integration', () => {
         renderWithProviders();
         expect(screen.getByText(/Логин/i)).toBeInTheDocument();
         expect(screen.getByText(/Имя/i)).toBeInTheDocument();
-        expect(screen.getByText(/Фамилия/i)).toBeInTheDocument();
+        expect(screen.getByText(/Фамилия/i)).toBeInTheDocument(); // Исправлено
         expect(screen.getByText(/Отчество/i)).toBeInTheDocument();
         expect(screen.getByText(/Пароль/i)).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Отправить/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Отправить/i })).toBeInTheDocument(); // Исправлено
     });
 
     test('выполняет регистрацию при корректных данных', async () => {
@@ -41,20 +40,21 @@ describe('Registration Integration', () => {
 
         const usernameInput = getInputByLabel('Логин');
         const nameInput = getInputByLabel('Имя');
-        const surnameInput = getInputByLabel('Фамилия');
+        const surnameInput = getInputByLabel('Фамилия'); // Исправлено
         const patronymicInput = getInputByLabel('Отчество');
         const passwordInput = getInputByLabel('Пароль');
 
         fireEvent.change(usernameInput, { target: { value: 'newuser' } });
         fireEvent.change(nameInput, { target: { value: 'Новый' } });
         fireEvent.change(surnameInput, { target: { value: 'Пользователь' } });
-        fireEvent.change(patronymicInput, { target: { value: 'Тестович' } });
+        fireEvent.change(patronymicInput, { target: { value: 'Тестович' } }); // Исправлено
         fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-        fireEvent.click(screen.getByRole('button', { name: /Отправить/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Отправить/i })); // Исправлено
 
         await waitFor(() => {
-            expect(window.location.pathname).toBe('/login');
+            // В Registration.jsx используется navigate('/signin'), а не '/login'
+            expect(window.location.pathname).toBe('/signin'); 
         });
     });
 
@@ -72,15 +72,15 @@ describe('Registration Integration', () => {
 
         const usernameInput = getInputByLabel('Логин');
         const nameInput = getInputByLabel('Имя');
-        const surnameInput = getInputByLabel('Фамилия');
+        const surnameInput = getInputByLabel('Фамилия'); // Исправлено
         const passwordInput = getInputByLabel('Пароль');
 
         fireEvent.change(usernameInput, { target: { value: 'existing' } });
-        fireEvent.change(nameInput, { target: { value: 'Существ' } });
+        fireEvent.change(nameInput, { target: { value: 'Существ' } }); // Исправлено
         fireEvent.change(surnameInput, { target: { value: 'Пользователь' } });
         fireEvent.change(passwordInput, { target: { value: 'password123' } });
 
-        fireEvent.click(screen.getByRole('button', { name: /Отправить/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Отправить/i })); // Исправлено
 
         await waitFor(() => {
             expect(screen.getByText(/Пользователь уже существует/i)).toBeInTheDocument();

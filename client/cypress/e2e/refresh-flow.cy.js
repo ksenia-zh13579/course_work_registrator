@@ -21,20 +21,35 @@ describe('Token Refresh Flow', () => {
     });
 
     it('должен автоматически обновить токен при истечении', () => {
+        // ИСПРАВЛЕНО: Используем req.reply с заголовками, чтобы Axios распознал 401
         cy.intercept('GET', '/api/profile', (req) => {
             req.reply({
                 statusCode: 401,
                 body: { message: 'Token expired' },
+                headers: { 'content-type': 'application/json' }
             });
-        }).as('expiredRequest');
+        }).as('profile401');
 
         cy.intercept('POST', '/api/auth/refresh', {
             statusCode: 200,
-            body: { accessToken: 'new-access-token' },
+            body: { accessToken: 'new-access-token' }
         }).as('refreshRequest');
 
+        cy.intercept('GET', '/api/profile', {
+            statusCode: 200,
+            body: { data: { username: testUser.username, role: 'ADMIN' } }
+        }).as('profile200');
+
         cy.visit('/profile');
+
+        // Ждем, что первый запрос упал с 401
+        cy.wait('@profile401');
+        
+        // Ждем, что сработал механизм refresh
         cy.wait('@refreshRequest');
-        cy.contains('Профиль').should('exist');
+
+        // Ждем, что профиль успешно загрузился после обновления токена
+        cy.wait('@profile200');
+        cy.contains(testUser.username).should('exist');
     });
 });

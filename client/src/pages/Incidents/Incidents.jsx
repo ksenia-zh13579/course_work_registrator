@@ -212,10 +212,11 @@ export default function Incidents() {
           onClose={() => setShowModal(false)}
           onSubmit={handleSubmit}
         >
-          <label className="form-label">Тип происшествия:</label>
+          <label htmlFor="incident_type_id" className="form-label">Тип происшествия:</label>
           <select
             className="form-select"
             name="incident_type_id"
+            id="incident_type_id"
             value={formData.incident_type_id}
             onChange={(e) => setFormData(prev => ({ ...prev, incident_type_id: e.target.value ? Number(e.target.value) : '' }))}
             required
@@ -228,8 +229,9 @@ export default function Incidents() {
             ))}
           </select>
 
-          <label className="form-label">Дата:</label>
+          <label htmlFor="date_input" className="form-label">Дата:</label>
             <input
+              id="date_input"
               className="form-input"
               type="date"
               value={formData.date}
@@ -237,8 +239,9 @@ export default function Incidents() {
               required
             />
 
-          <label className="form-label">Описание:</label>
+          <label htmlFor="description_input" className="form-label">Описание:</label>
           <input
+            id="description_input"
             className="form-input"
             type="text"
             value={formData.description}
@@ -248,8 +251,9 @@ export default function Incidents() {
 
           {isAdmin && (
             <>
-              <label className="form-label">Статус:</label>
+              <label htmlFor="incident_status_id" className="form-label">Статус:</label>
               <select
+                id="incident_status_id"
                 className="form-select"
                 name="incident_status_id"
                 value={formData.incident_status_id}

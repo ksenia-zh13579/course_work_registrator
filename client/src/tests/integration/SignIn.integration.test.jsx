@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '../../context/AuthContext';
-import SignIn from '../../pages/SignIn';
-import { server } from './mocks/server';
+import { AuthProvider } from '../../context/AuthContext.jsx';
+import SignIn from '../../pages/SignIn/SignIn.jsx';
+import { server } from './mocks/server.js';
 import { http, HttpResponse } from 'msw';
 
 function getInputByLabel(labelText) {
@@ -44,7 +44,7 @@ describe('SignIn Integration', () => {
         fireEvent.click(screen.getByRole('button', { name: /Войти/i }));
 
         await waitFor(() => {
-        expect(window.location.pathname).toBe('/');
+            expect(window.location.pathname).toBe('/');
         });
     });
 
@@ -69,7 +69,7 @@ describe('SignIn Integration', () => {
         fireEvent.click(screen.getByRole('button', { name: /Войти/i }));
 
         await waitFor(() => {
-        expect(screen.getByText(/Неверный логин или пароль/i)).toBeInTheDocument();
+            expect(screen.getByText(/Неверный логин или пароль/i)).toBeInTheDocument();
         });
     });
 });

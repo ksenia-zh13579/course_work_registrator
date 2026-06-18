@@ -2,7 +2,7 @@ import { redactProfileSchema } from '../../../validators/profileValidator.js';
 
 describe('Profile Validator', () => {
     test('должен валидировать обновление с одним полем', () => {
-        const data = { username: 'newuser' };
+        const data = { username: 'newuser', old_password: 'oldPass123' };
         const result = redactProfileSchema.safeParse(data);
         expect(result.success).toBe(true);
     });

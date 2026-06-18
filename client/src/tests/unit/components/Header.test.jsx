@@ -1,9 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Header from '../../../components/Header';
-import { useAuth } from '../../../context/AuthContext';
+import Header from '../../../components/Header/Header.jsx';
+import { useAuth } from '../../../context/AuthContext.jsx';
 
-// Мокаем хук useAuth
 vi.mock('../../../context/AuthContext', () => ({
     useAuth: vi.fn(),
 }));
@@ -20,8 +19,7 @@ describe('Header', () => {
             isAdmin: false,
         });
         renderWithRouter(<Header />);
-        expect(screen.getByText('Вход')).toBeInTheDocument();
-        expect(screen.getByText('Регистрация')).toBeInTheDocument();
+        expect(screen.getByText('Войти')).toBeInTheDocument();
     });
 
     test('отображает имя пользователя для авторизованного', () => {

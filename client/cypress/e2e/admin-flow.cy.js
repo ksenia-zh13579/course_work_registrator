@@ -21,25 +21,22 @@ describe('Admin Flow', () => {
         cy.contains('label', 'Имя').next('input').type('Участник');
         cy.contains('label', 'Адрес').next('input').type('ул. Тестовая, 1');
         cy.contains('label', 'Количество судимостей').next('select').select('0');
-        cy.get('button').contains('Сохранить').click();
-        cy.contains('Тестов Участник').should('exist');
+        cy.get('button').contains('Отправить').click();
+        
+        // ИСПРАВЛЕНО: Ищем просто фамилию, так как ФИО в разных ячейках
+        cy.contains('Тестов').should('exist');
 
         // Редактирование участника
-        cy.contains('Тестов Участник')
-        .parent()
-        .contains('Редактировать')
-        .click();
+        // ИСПРАВЛЕНО: Ищем кнопку внутри всей строки таблицы
+        cy.contains('div.table-row', 'Тестов').contains('Редактировать').click();
         cy.contains('label', 'Фамилия').next('input').clear().type('ТестовИзм');
-        cy.get('button').contains('Сохранить').click();
-        cy.contains('ТестовИзм Участник').should('exist');
+        cy.get('button').contains('Отправить').click();
+        cy.contains('ТестовИзм').should('exist');
 
         // Удаление участника
-        cy.contains('ТестовИзм Участник')
-            .parent()
-            .contains('Удалить')
-            .click();
-        cy.contains('Подтвердить').click();
-        cy.contains('ТестовИзм Участник').should('not.exist');
+        cy.on('window:confirm', () => true); // Мокаем нативный confirm
+        cy.contains('div.table-row', 'ТестовИзм').contains('Удалить').click();
+        cy.contains('ТестовИзм').should('not.exist');
     });
 
     it('должен управлять статусами участников происшествий', () => {
@@ -50,16 +47,14 @@ describe('Admin Flow', () => {
         cy.contains('label', 'ID происшествия').next('input').type('1');
         cy.contains('label', 'ID участника').next('input').type('1');
         cy.contains('label', 'Статус участника').next('select').select('SUSPECT');
-        cy.get('button').contains('Сохранить').click();
+        cy.get('button').contains('Отправить').click();
         cy.contains('Подозреваемый').should('exist');
 
         // Редактирование статуса
-        cy.contains('Подозреваемый')
-            .parent()
-            .contains('Редактировать')
-            .click();
+        // ИСПРАВЛЕНО: Ищем кнопку внутри всей строки таблицы
+        cy.contains('div.table-row', 'Подозреваемый').contains('Редактировать').click();
         cy.contains('label', 'Статус участника').next('select').select('VICTIM');
-        cy.get('button').contains('Сохранить').click();
+        cy.get('button').contains('Отправить').click();
         cy.contains('Потерпевший').should('exist');
     });
 });

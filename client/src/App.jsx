@@ -29,7 +29,7 @@ export default function App() {
       <main className="app-main">
         <Routes>
           <Route path="/" element={<Main />} />
-          <Route path="/signin" element={<SignIn />} />
+          <Route path="/login" element={<SignIn />} />
           <Route path="/register" element={<Registration />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/involvements" element={<Involvements />} />

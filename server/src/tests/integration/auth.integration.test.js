@@ -50,7 +50,7 @@ describe('Auth Integration', () => {
         test('должен вернуть 401 при неверном пароле', async () => {
             const response = await request(app)
                 .post('/api/auth/login')
-                .send({ username: testUser.username, password: 'wrong' });
+                .send({ username: testUser.username, password: 'wrongpass' });
 
             expect(response.status).toBe(401);
         });

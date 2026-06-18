@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/Modal/Modal.jsx';
 
 describe('Modal', () => {
     const mockOnClose = vi.fn();
@@ -29,7 +29,7 @@ describe('Modal', () => {
                 Content
             </Modal>
         );
-        fireEvent.click(screen.getByRole('button', { name: /close/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Закрыть/i }));
         expect(mockOnClose).toHaveBeenCalled();
     });
 });

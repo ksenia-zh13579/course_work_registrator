@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import styles from './Modal.module.scss';
 
-export default function Modal({ title, onClose, onSubmit, submitLabel = 'Отправить', children }) {
+export default function Modal({ title, onClose, onSubmit, submitLabel = 'Отправить', children, isOpen = true }) {
+  if (!isOpen) return null;
+  
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', onKey);
