@@ -8,7 +8,10 @@
     "start": "node src/server.js",
     "migrate": "prisma migrate dev",
     "seed": "node prisma/seed.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env NODE_ENV=test jest --runInBand",
+    "test:watch": "cross-env NODE_ENV=test jest --watch  --runInBand",
+    "test:integration": "cross-env NODE_ENV=test jest --testPathPattern=integration --runInBand",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -32,7 +35,14 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@types/jest": "^30.0.0",
+    "babel-jest": "^30.4.1",
+    "cross-env": "^10.1.0",
+    "jest": "^30.4.2",
     "nodemon": "^3.1.14",
-    "prisma": "^7.8.0"
+    "prisma": "^7.8.0",
+    "supertest": "^7.2.2"
   }
 }
